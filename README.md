@@ -95,3 +95,101 @@ Key features:
   <!-- Language -->
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
 </div>
+
+---
+
+## Backend Server
+
+This section details the setup and execution of the FastAPI-based backend server.
+
+### Tech Stack
+
+| Category         | Technology                                | Purpose                               |
+| ---------------- | ----------------------------------------- | ------------------------------------- |
+| Language         | Python 3.11+                              | Core programming language             |
+| Web Framework    | FastAPI                                   | High-performance API framework        |
+| Database ORM     | SQLAlchemy                                | Database interaction and modeling     |
+| Data Validation  | Pydantic                                  | Data validation and settings management |
+| Password Hashing | Argon2 (`argon2-cffi`)                    | Secure password storage               |
+| JWT Authentication | `python-jose`                             | Token generation and validation       |
+| Server           | Uvicorn                                   | ASGI server for running FastAPI       |
+
+### Project Structure
+
+The backend code is organized within the `app/` directory with a modular structure.
+
+```
+app/
+├── api/          # API endpoint logic
+│   ├── deps.py   # Dependency injection (e.g., DB session)
+│   └── v1/       # API version 1
+│       └── endpoints/
+│           └── auth.py # Authentication-related APIs
+├── core/         # Core logic (settings, security)
+│   ├── config.py
+│   └── security.py
+├── crud/         # Database CRUD (Create, Read, Update, Delete) operations
+│   └── crud_user.py
+├── db/           # Database session management and base models
+│   ├── base.py
+│   └── session.py
+├── models/       # SQLAlchemy database models
+│   └── user.py
+└── schemas/      # Pydantic data schemas for request/response validation
+    ├── __init__.py
+    ├── token.py
+    └── user.py
+```
+
+### Local Development Setup
+
+Follow these steps to set up and run the backend server on your local machine.
+
+**1. Create a Virtual Environment**
+
+Create and activate a Python virtual environment. This keeps project dependencies isolated.
+
+```shell
+# Create the virtual environment
+python -m venv .venv
+
+# Activate on Windows
+.venv\Scripts\activate
+```
+
+**2. Install Dependencies**
+
+Install all required libraries from the `requirements.txt` file.
+
+```shell
+pip install -r requirements.txt
+```
+
+**3. Set Up Environment Variables**
+
+Create a `.env` file in the project root by copying the example file.
+
+```shell
+# On Windows
+copy .env.example .env
+```
+
+Open the newly created `.env` file and change `SECRET_KEY` to a new random string. The other default values are suitable for local development.
+
+### Running the API Server
+
+Once the setup is complete, run the Uvicorn server with the following command:
+
+```shell
+uvicorn app.main:app --reload
+```
+
+The server will be available at `http://127.0.0.1:8000`. The `--reload` flag ensures the server automatically restarts when you make code changes.
+
+### API Documentation
+
+With the server running, you can access the interactive API documentation (Swagger UI) by navigating to the following URL in your browser:
+
+[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+From this page, you can view all available API endpoints and test them directly.
