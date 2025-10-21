@@ -4,10 +4,9 @@ from app.api.v1.api import api_router
 from app.core.config import settings
 from app.db.base import create_tables
 
-# Create tables on startup
 create_tables()
 
-app = FastAPI(title="Capstone Project API")
+app = FastAPI(title="Capstone Project team5 API")
 
 app.include_router(api_router, prefix="/api/v1")
 
