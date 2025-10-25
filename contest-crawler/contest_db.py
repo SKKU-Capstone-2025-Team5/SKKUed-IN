@@ -3,7 +3,7 @@ import sqlite3
 import os
 from datetime import date
 
-DB_NAME = "../db/contest_info.db"
+DB_NAME = "/db/contest_info.db"
 
 def init_db():
     """
