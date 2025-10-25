@@ -6,7 +6,7 @@ venv/
 
 # database
 *.db
-/db
+db/
 *.sqlite3
 
 # environments
