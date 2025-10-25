@@ -1,3 +1,14 @@
-/.venv
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# database
+*.db
 /db
-*__pycache__
+*.sqlite3
+
+# environments
+.env
+/images
