@@ -29,7 +29,7 @@ def update_user_me(
     """
     Update current user's profile.
     """
-    user = crud.update_user(db, db_user=current_user, user_in=user_in)
+    user = crud.user.update_user(db, db_user=current_user, user_in=user_in)
     return user
 
 @router.get("/{user_id}", response_model=schemas.User)

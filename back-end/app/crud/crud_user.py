@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
 from app.models.user import User
-from app.schemas.user import UserCreate, UserBase # Import UserBase for update
+from app.schemas.user import UserCreate, UserBase, UserUpdate # Import UserBase for update
 from typing import Any, Dict, Optional, Union
 
 def get_user_by_email(db: Session, email: str):
@@ -45,7 +45,7 @@ def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
 def update_user(
     db: Session,
     db_user: User,
-    user_in: Union[UserBase, Dict[str, Any]]
+    user_in: Union[UserUpdate, Dict[str, Any]]
 ) -> User:
     if isinstance(user_in, dict):
         update_data = user_in
