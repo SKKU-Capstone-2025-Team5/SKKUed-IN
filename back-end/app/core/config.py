@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your_super_secret_key_here"
     DATABASE_URL: str = "sqlite:///./test.db"
     
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Email
     MAIL_USERNAME: str | None = None
