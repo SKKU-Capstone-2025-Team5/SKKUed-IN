@@ -1,32 +1,6 @@
-// import React from 'react';
-// import { Link, useNavigate } from 'react-router-dom';
-
-// function Main() {
-//   const navigate = useNavigate();
-
-//   const handleLogout = () => {
-//     localStorage.removeItem('accessToken');
-//     navigate('/login');
-//   };
-
-//   return (
-//     <div>
-//       <div style={{ position: 'absolute', top: '1rem', right: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-//         <Link to="/profile" style={{ textDecoration: 'none', color: '#388E3C', whiteSpace: 'nowrap' }}>Profile Settings</Link>
-//         <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#388E3C', cursor: 'pointer', whiteSpace: 'nowrap', padding: 0, margin: 0 }}>Logout</button>
-//       </div>
-//       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-//         <h1>MAIN</h1>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Main;
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './Main.css'; // 아래 2번에서 만들 CSS 파일
+import './Main.css'; 
 
 /**
  * D-Day 계산 함수
@@ -64,14 +38,11 @@ function Main() {
   useEffect(() => {
     const fetchContests = async () => {
       try {
-        // --- 👇 [수정됨] 토큰 헤더 추가 시작 ---
 
         // 1. localStorage에서 토큰 가져오기
         const token = localStorage.getItem('accessToken');
 
         if (!token) {
-          // 토큰이 없으면 로그인 페이지로 보내거나 에러 처리를 할 수 있습니다.
-          // 여기서는 일단 에러 메시지를 표시합니다.
           throw new Error('인증 토큰이 없습니다. 로그인이 필요합니다.');
         }
 
@@ -80,15 +51,11 @@ function Main() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            // ⭐️ 이 부분이 핵심입니다!
             'Authorization': `Bearer ${token}` 
           }
         });
-        
-        // --- 👆 [수정됨] 토큰 헤더 추가 끝 ---
 
         if (!response.ok) {
-          // 401 Unauthorized(토큰 만료 등) 같은 에러도 여기서 잡힙니다.
           throw new Error('서버에서 데이터를 가져오는 데 실패했습니다.');
         }
 
@@ -104,7 +71,6 @@ function Main() {
     fetchContests();
   }, []); // 컴포넌트 마운트 시 한 번만 실행
 
-  // --- UI 렌더링 (이하 변경 없음) ---
   if (loading) {
     return <div>데이터를 불러오는 중입니다...</div>;
   }
@@ -120,8 +86,8 @@ function Main() {
       
       <div className="contest-list">
         {contests.map((contest) => (
-          <div key={contest.contest_id} className="contest-card">
-            <Link to={`/contests/${contest.contest_id}`} className="card-link">
+          <div key={contest.id} className="contest-card">
+            <Link to={`/contests/${contest.id}`} className="card-link">
               
               <div className="card-image-container">
                 <img src={contest.ex_image} alt={contest.ex_name} className="card-image" />
