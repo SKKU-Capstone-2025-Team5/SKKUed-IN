@@ -1,15 +1,14 @@
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "SKKUed-IN"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
-    # Database
-    DATABASE_URL: str
+    SECRET_KEY: str = "your_super_secret_key_here"
+    DATABASE_URL: str = "sqlite:///./test.db"
 
     # Email
     MAIL_USERNAME: str | None = None
