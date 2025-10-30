@@ -13,7 +13,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 import contest_db
 
-
 def dev_crawling(driver):
     wait = WebDriverWait(driver, 10)
     all_data = wait.until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "Item_item__HzT1B")))
@@ -151,8 +150,6 @@ def link_crawling(driver):
 
 
 def main():
-    contest_db.init_db()
-    
     options = Options()
     options.add_argument("--disable-gpu")
     options.add_argument("--headless")
