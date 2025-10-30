@@ -193,3 +193,46 @@ With the server running, you can access the interactive API documentation (Swagg
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 From this page, you can view all available API endpoints and test them directly.
+
+## Frontend Server
+### Local Development Setup
+
+Follow these steps to set up and run the backend server on your local machine.
+
+**1. Create a Virtual Environment**
+
+Create and activate a Python virtual environment. This keeps project dependencies isolated.
+
+```shell
+# Create the virtual environment
+python -m venv .venv
+
+# Activate on Windows
+.venv\Scripts\activate
+```
+
+**2. Install Dependencies**
+
+Install all the required libraries (packages) for the project. This command creates the `node_modules` folder.
+
+```shell
+npm install
+```
+
+### Running the Development Server
+
+Once the installation is complete, start the Vite development server with the following command:
+
+```shell
+npm run dev
+```
+
+When the server starts successfully, the terminal will display a local address like `http://localhost:5173/`.
+
+The server run with npm run dev supports HMR (Hot Module Replacement). Similar to a --reload flag, this means that when you edit and save your code, the changes are reflected in the browser instantly without a full server restart.
+
+### Access the Application
+
+While the server is running, you can access the frontend application by navigating to the following URL in your browser:
+
+`http://localhost:5173`
