@@ -1,0 +1,105 @@
+/* Profile.css */
+
+.profile-container {
+  padding: 2rem;
+  width: 100%; /* Explicitly set width to 100% */
+  max-width: 1000px; /* Set a maximum width */
+  margin: 0 auto; /* Center the container */
+  font-family: Arial, sans-serif;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.profile-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.profile-form div {
+  margin-bottom: 1rem;
+}
+
+.profile-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="email"],
+.profile-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.profile-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.profile-form input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.profile-form button {
+  padding: 0.75rem 1.5rem;
+  background-color: #A5D6A7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background-color: #66BB6A;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  text-align: center;
+}
+
+.skill-tag-container,
+.interest-tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.skill-tag,
+.interest-tag {
+  background-color: #E8F5E9; /* Light green block */
+  color: #388E3C; /* Darker green text */
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: #388E3C;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
