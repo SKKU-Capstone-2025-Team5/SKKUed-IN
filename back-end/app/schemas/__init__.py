@@ -26,3 +26,4 @@ from .notification import (
     NotificationRead,
     NotificationUpdate,
 )
+from .contest import Contest, ContestCreate, ContestUpdate
