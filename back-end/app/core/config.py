@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+import os
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "SKKUed-IN"
@@ -18,6 +19,8 @@ class Settings(BaseSettings):
     MAIL_SERVER: str | None = None
     MAIL_TLS: bool = True
     MAIL_SSL: bool = False
+
+    UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
 
     class Config:
         env_file = ".env"
