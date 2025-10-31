@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -19,6 +20,8 @@ class Settings(BaseSettings):
     MAIL_SERVER: str | None = None
     MAIL_TLS: bool = True
     MAIL_SSL: bool = False
+
+    UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
 
     class Config:
         env_file = ".env"
