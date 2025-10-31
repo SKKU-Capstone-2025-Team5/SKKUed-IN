@@ -4,7 +4,7 @@ from typing import List, Optional, Dict, Any
 class ProfileBase(BaseModel):
     major: Optional[str] = Field(None, max_length=255)
     age: Optional[str] = Field(None, max_length=50)
-    phone_number: Optional[EmailStr | str] = None # Can be email or phone number
+    phone_number: Optional[EmailStr | str] = None #email or phone num. 
     introduction: Optional[str] = Field(None, max_length=1000)
     profile_image_url: Optional[HttpUrl] = None
 
@@ -16,11 +16,9 @@ class ProfileBase(BaseModel):
     age_public: Optional[bool] = False
 
 class ProfileCreate(ProfileBase):
-    # All fields are optional for creation, as they might be set during onboarding
     pass
 
 class ProfileUpdate(ProfileBase):
-    # All fields are optional for update
     pass
 
 class ProfileInDBBase(ProfileBase):

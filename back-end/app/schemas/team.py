@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, HttpUrl
 from app.models.team import TeamStatus, TeamMemberRole, TeamMemberStatus, InvitationStatus
+from app.schemas.contest import Contest
 
 # Team Schemas
 class TeamBase(BaseModel):
@@ -27,6 +28,7 @@ class TeamRead(TeamBase):
     leader_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
+    contest: Optional[Contest] = None
 
     class Config:
         from_attributes = True
@@ -38,12 +40,12 @@ class OpenPositionBase(BaseModel):
     required_count: int = 1
 
 class OpenPositionCreate(OpenPositionBase):
-    team_id: Optional[int] = None # Will be set by the backend
+    team_id: Optional[int] = None 
 
 class OpenPositionRead(OpenPositionBase):
     id: int
     team_id: int
-    filled_count: int # New field
+    filled_count: int 
 
     class Config:
         from_attributes = True
@@ -54,7 +56,7 @@ class TeamMemberBase(BaseModel):
     role: TeamMemberRole = TeamMemberRole.MEMBER
 
 class TeamMemberCreate(TeamMemberBase):
-    team_id: Optional[int] = None # Will be set by the backend
+    team_id: Optional[int] = None 
 
 class TeamMemberRead(TeamMemberBase):
     id: int
@@ -69,7 +71,7 @@ class InvitationBase(BaseModel):
     email: str
 
 class InvitationCreate(InvitationBase):
-    team_id: Optional[int] = None # Will be set by the backend
+    team_id: Optional[int] = None 
 
 class InvitationRead(InvitationBase):
     id: int

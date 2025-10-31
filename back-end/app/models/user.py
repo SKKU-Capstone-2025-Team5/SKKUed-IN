@@ -31,5 +31,6 @@ class User(Base):
     )
 
     led_teams = relationship("Team", back_populates="leader")
-    teams = relationship("TeamMember", back_populates="user")
+    team_memberships = relationship("TeamMember", back_populates="user")
+    teams = relationship("Team", secondary="team_members", back_populates="users", viewonly=True)
     notifications = relationship("Notification", back_populates="recipient", cascade="all, delete-orphan")

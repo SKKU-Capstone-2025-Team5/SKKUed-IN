@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "SKKUed-IN"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = "your_super_secret_key_here"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ALGORITHM: str = "HS256"
     DATABASE_URL: str = "sqlite:///./test.db"
 
     # Email

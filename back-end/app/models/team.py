@@ -27,6 +27,7 @@ class Team(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False, index=True)
     description = Column(Text)
+    contest_id = Column(Integer, ForeignKey("contests.id"), nullable=True)
     # project_id will be added later when a Project model exists
     # project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     is_public = Column(Boolean, default=True)
@@ -39,6 +40,8 @@ class Team(Base):
     leader = relationship("User", back_populates="led_teams")
     members = relationship("TeamMember", back_populates="team", cascade="all, delete-orphan")
     open_positions = relationship("OpenPosition", back_populates="team", cascade="all, delete-orphan")
+    contest = relationship("Contest", back_populates="teams")
+    users = relationship("User", secondary="team_members", back_populates="teams", viewonly=True)
 
 
 class TeamMemberRole(enum.Enum):
@@ -61,7 +64,7 @@ class TeamMember(Base):
     status = Column(Enum(TeamMemberStatus), default=TeamMemberStatus.ACCEPTED, nullable=False) # New status column
     
     team = relationship("Team", back_populates="members")
-    user = relationship("User", back_populates="teams")
+    user = relationship("User", back_populates="team_memberships")
 
 
 class OpenPosition(Base):

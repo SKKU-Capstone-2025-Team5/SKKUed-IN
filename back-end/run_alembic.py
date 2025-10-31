@@ -1,10 +1,9 @@
 import sys
-from alembic.config import Config
-from alembic import command
+from alembic.config import Config, CommandLine
 
 def run_alembic_command(args):
     alembic_cfg = Config("alembic.ini")
-    command.main(alembic_cfg, args)
+    CommandLine(alembic_cfg).main(argv=args)
 
 if __name__ == '__main__':
     # The first argument is the script name itself, so we skip it.

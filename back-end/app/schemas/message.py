@@ -17,19 +17,18 @@ class UserReadForMessage(BaseModel):
 
 class MessageBase(BaseModel):
     content: str
-    file_url: Optional[HttpUrl] = None # For file attachments
-    reply_to_message_id: Optional[int] = None # For threading
+    file_url: Optional[HttpUrl] = None 
+    reply_to_message_id: Optional[int] = None 
 
 class MessageCreate(MessageBase):
     conversation_id: int
-    # sender_id will be set by the backend based on the authenticated user
 
 class MessageRead(MessageBase):
     id: int
     created_at: datetime.datetime
-    sender: UserReadForMessage # Nested schema for sender
+    sender: UserReadForMessage 
     conversation_id: int
-    read_by: List[int] = [] # List of user IDs who have read the message
+    read_by: List[int] = [] 
 
     class Config:
         from_attributes = True
@@ -38,17 +37,15 @@ class ConversationBase(BaseModel):
     type: ConversationType
 
 class ConversationCreate(ConversationBase):
-    # For DMs, list of user IDs to include (usually 2)
     participant_ids: Optional[List[int]] = None
-    # For team chats, the team ID
-    team_id: Optional[int] = None # Assuming a Team model exists or will exist
+    team_id: Optional[int] = None
 
 class ConversationRead(ConversationBase):
     id: int
     created_at: datetime.datetime
-    participants: List[UserReadForMessage] # Nested schema for participants
-    latest_message: Optional[MessageRead] = None # Latest message in the conversation
-    unread_count: int = 0 # Number of unread messages for the current user
+    participants: List[UserReadForMessage] 
+    latest_message: Optional[MessageRead] = None
+    unread_count: int = 0 
 
     class Config:
         from_attributes = True
