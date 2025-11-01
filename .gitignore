@@ -12,3 +12,6 @@ db/
 # environments
 .env
 /images
+
+# data
+data/
