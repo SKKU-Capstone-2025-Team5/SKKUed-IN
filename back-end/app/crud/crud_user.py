@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.security import get_password_hash, verify_password
 from app.models.user import User
@@ -6,7 +6,7 @@ from app.schemas.user import UserCreate, UserBase, UserUpdate # Import UserBase 
 from typing import Any, Dict, Optional, Union
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    return db.query(User).options(joinedload(User.teams)).filter(User.email == email).first()
 
 
 def authenticate_user(db: Session, email: str, password: str):
@@ -40,7 +40,7 @@ def create_user(db: Session, user: UserCreate) -> User:
     return db_user
 
 def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
-    return db.query(User).filter(User.id == user_id).first()
+    return db.query(User).options(joinedload(User.teams)).filter(User.id == user_id).first()
 
 def update_user(
     db: Session,

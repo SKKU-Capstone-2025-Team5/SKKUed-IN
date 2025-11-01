@@ -40,6 +40,7 @@ from app.db.base import Base
 from app.models.user import User # Import your models here
 from app.models.team import Team, TeamMember, OpenPosition, Invitation
 from app.models.notification import Notification
+from app.models.contest import Contest
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

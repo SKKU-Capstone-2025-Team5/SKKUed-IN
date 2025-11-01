@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from datetime import datetime, timedelta
 import secrets # For generating tokens
@@ -11,13 +11,13 @@ from app.crud.crud_notification import create_notification
 from app.crud.crud_user import get_user_by_email 
 
 def get_team(db: Session, team_id: int) -> Optional[Team]:
-    return db.query(Team).filter(Team.id == team_id).first()
+    return db.query(Team).options(joinedload(Team.contest)).filter(Team.id == team_id).first()
 
 def get_teams_by_user(db: Session, user_id: int) -> List[Team]:
-    return db.query(Team).join(TeamMember).filter(TeamMember.user_id == user_id).all()
+    return db.query(Team).options(joinedload(Team.contest)).join(TeamMember).filter(TeamMember.user_id == user_id).all()
 
 def get_public_teams(db: Session, skip: int = 0, limit: int = 100) -> List[Team]:
-    return db.query(Team).filter(Team.is_public == True).offset(skip).limit(limit).all()
+    return db.query(Team).options(joinedload(Team.contest)).filter(Team.is_public == True).offset(skip).limit(limit).all()
 
 def create_team(db: Session, team_in: TeamCreate, leader_id: int) -> Team:
     # 팀 만들기 
