@@ -29,7 +29,7 @@ function Login() {
 
       if (response.data.access_token) {
         localStorage.setItem('accessToken', response.data.access_token);
-        navigate('/main');
+        navigate('/find-project');
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.detail) {

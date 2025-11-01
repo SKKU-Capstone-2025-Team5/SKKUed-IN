@@ -1,4 +1,6 @@
 from .user import User, UserCreate, UserUpdate
+from .skill import Skill
+from .interest import Interest
 from .token import Token, TokenData
 from .message import (
     ConversationType,

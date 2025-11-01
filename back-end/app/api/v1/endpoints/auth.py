@@ -33,7 +33,7 @@ def register_user(
             status_code=400,
             detail="Only SKKU email addresses are allowed for registration.",
         )
-    user = crud.user.create_user(db, user=user_in)
+    user = crud.user.create(db, obj_in=user_in)
     return user
 
 

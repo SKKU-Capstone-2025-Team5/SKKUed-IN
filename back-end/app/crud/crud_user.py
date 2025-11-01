@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
-from app.models.user import User
+from app.models.user import User, Skill, Interest
 from app.schemas.user import UserCreate, UserBase, UserUpdate # Import UserBase for update
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, List
 
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
@@ -18,29 +18,41 @@ def authenticate_user(db: Session, email: str, password: str):
     return user
 
 
-def create_user(db: Session, user: UserCreate) -> User:
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
-        email=user.email,
-        full_name=user.full_name,
-        hashed_password=hashed_password,
-        major=user.major,
-        age=user.age,
-        phone_number=user.phone_number,
-        introduction=user.introduction,
-        profile_image_url=str(user.profile_image_url) if user.profile_image_url else None,
-        core_skill_tags=user.core_skill_tags,
-        interests=user.interests,
-        phone_number_public=user.phone_number_public,
-        age_public=user.age_public,
+def create(db: Session, *, obj_in: UserCreate) -> User:
+    db_obj = User(
+        email=obj_in.email,
+        hashed_password=get_password_hash(obj_in.password),
+        full_name=obj_in.full_name,
+        is_superuser=obj_in.is_superuser,
+        major=obj_in.major
     )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
 
-def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
-    return db.query(User).filter(User.id == user_id).first()
+    if obj_in.skills:
+        for skill_name in obj_in.skills:
+            skill = db.query(Skill).filter(Skill.name == skill_name).first()
+            if not skill:
+                skill = Skill(name=skill_name)
+                db.add(skill)
+            db_obj.skills.append(skill)
+
+    if obj_in.interests:
+        for interest_name in obj_in.interests:
+            interest = db.query(Interest).filter(Interest.name == interest_name).first()
+            if not interest:
+                interest = Interest(name=interest_name)
+                db.add(interest)
+            db_obj.interests.append(interest)
+
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+def get_multi(db: Session, *, skip: int = 0, limit: int = 100) -> List[User]:
+    return db.query(User).offset(skip).limit(limit).all()
+
+def get_multi_by_ids(db: Session, *, ids: List[int]) -> List[User]:
+    return db.query(User).filter(User.id.in_(ids)).all()
 
 def update_user(
     db: Session,

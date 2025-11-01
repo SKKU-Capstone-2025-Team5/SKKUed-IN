@@ -135,11 +135,20 @@ function Profile() {
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <h2>Profile Settings</h2>
-        <Link to="/main" className="back-link">Back to Main</Link>
+        <h2>My Page</h2>
       </div>
       {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleUpdate} className="profile-form">
+        <div>
+          <label>Profile Image:</label>
+          {filePreview && (
+            <div className="profile-image-preview">
+              <img src={filePreview} alt="Profile Preview" style={{ maxWidth: '150px', maxHeight: '150px', borderRadius: '50%', objectFit: 'cover' }} />
+            </div>
+          )}
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+          <button type="button" onClick={handleUpload} disabled={!selectedFile}>Upload Image</button>
+        </div>
         <div>
           <label>Full Name:</label>
           <input type="text" name="full_name" value={profile.full_name || ''} onChange={handleChange} />
@@ -159,16 +168,6 @@ function Profile() {
         <div>
           <label>Introduction:</label>
           <textarea name="introduction" value={profile.introduction || ''} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Profile Image:</label>
-          {filePreview && (
-            <div className="profile-image-preview">
-              <img src={filePreview} alt="Profile Preview" style={{ maxWidth: '150px', maxHeight: '150px', borderRadius: '50%', objectFit: 'cover' }} />
-            </div>
-          )}
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-          <button type="button" onClick={handleUpload} disabled={!selectedFile}>Upload Image</button>
         </div>
         <div>
           <label>Core Skills (comma-separated):</label>
