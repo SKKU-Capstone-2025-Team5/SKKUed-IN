@@ -199,6 +199,29 @@ From this page, you can view all available API endpoints and test them directly.
 
 Follow these steps to set up and run the backend server on your local machine.
 
+```
+src/
+|   App.css
+|   App.jsx
+|   index.css
+|   main.jsx
+|
++---assets
+|       react.svg
+|
+\---components
+        ContestDetail.css
+        ContestDetail.jsx
+        Login.css
+        Login.jsx
+        Main.css
+        Main.jsx
+        PrivateRoute.jsx
+        Profile.css
+        Profile.jsx
+        Register.jsx
+```
+
 **1. Create a Virtual Environment**
 
 Create and activate a Python virtual environment. This keeps project dependencies isolated.
