@@ -39,7 +39,7 @@ class UserMatcher:
         self.users = self.users.reset_index(drop=True)
         self.idx_by_id = {uid:i for i, uid in enumerate(self.users["user_id"])}
 
-    def topk_for(self, user_id: str, topk: int | None = None) -> List[Dict]:
+    def topk_for(self, user_id: int, topk: int | None = None) -> List[Dict]:
         if user_id not in self.idx_by_id:
             raise ValueError(f"user_id '{user_id}' not found")
         k = topk or self.cfg.topk
@@ -51,7 +51,7 @@ class UserMatcher:
         for j in order:
             row = self.users.iloc[j]
             out.append({
-                "user_id": row["user_id"],
+                "user_id": int(row["user_id"]), # Ensure user_id is int
                 "name": row["name"],
                 "major": row["major"],
                 "skills": row["skills"],

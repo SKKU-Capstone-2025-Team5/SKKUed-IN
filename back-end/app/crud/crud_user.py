@@ -1,12 +1,14 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.security import get_password_hash, verify_password
-from app.models.user import User, Skill, Interest
+from app.models.user import User
+from app.models.skill import Skill
+from app.models.interest import Interest
 from app.schemas.user import UserCreate, UserBase, UserUpdate # Import UserBase for update
 from typing import Any, Dict, Optional, Union, List
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    return db.query(User).options(selectinload(User.skills), selectinload(User.interests)).filter(User.email == email).first()
 
 
 def authenticate_user(db: Session, email: str, password: str):
@@ -19,12 +21,16 @@ def authenticate_user(db: Session, email: str, password: str):
 
 
 def create(db: Session, *, obj_in: UserCreate) -> User:
+    default_profile_image = "/images/basic_profile.png"
+    profile_image_to_use = obj_in.profile_image_url if obj_in.profile_image_url else default_profile_image
+
     db_obj = User(
         email=obj_in.email,
         hashed_password=get_password_hash(obj_in.password),
         full_name=obj_in.full_name,
         is_superuser=obj_in.is_superuser,
-        major=obj_in.major
+        major=obj_in.major,
+        profile_image_url=profile_image_to_use # Assign profile_image_url
     )
 
     if obj_in.skills:
@@ -48,8 +54,11 @@ def create(db: Session, *, obj_in: UserCreate) -> User:
     db.refresh(db_obj)
     return db_obj
 
-def get_multi(db: Session, *, skip: int = 0, limit: int = 100) -> List[User]:
-    return db.query(User).offset(skip).limit(limit).all()
+def get_multi(db: Session, *, skip: int = 0, limit: Optional[int] = 100) -> List[User]:
+    query = db.query(User).offset(skip)
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 def get_multi_by_ids(db: Session, *, ids: List[int]) -> List[User]:
     return db.query(User).filter(User.id.in_(ids)).all()
@@ -68,6 +77,28 @@ def update_user(
         hashed_password = get_password_hash(update_data["password"])
         del update_data["password"]
         update_data["hashed_password"] = hashed_password
+
+    # Handle skills update
+    if "skills" in update_data:
+        db_user.skills.clear() # Clear existing skills
+        for skill_name in update_data["skills"]:
+            skill = db.query(Skill).filter(Skill.name == skill_name).first()
+            if not skill:
+                skill = Skill(name=skill_name)
+                db.add(skill)
+            db_user.skills.append(skill)
+        del update_data["skills"]
+
+    # Handle interests update
+    if "interests" in update_data:
+        db_user.interests.clear() # Clear existing interests
+        for interest_name in update_data["interests"]:
+            interest = db.query(Interest).filter(Interest.name == interest_name).first()
+            if not interest:
+                interest = Interest(name=interest_name)
+                db.add(interest)
+            db_user.interests.append(interest)
+        del update_data["interests"]
 
     for field in update_data:
         if hasattr(db_user, field):

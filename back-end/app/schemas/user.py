@@ -14,7 +14,7 @@ class UserBase(BaseModel):
     phone_number: Optional[str] = Field(None, max_length=20)
     introduction: Optional[str] = Field(None, max_length=1000)
     profile_image_url: Optional[str] = None
-    core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
+    # core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
     # interests: Optional[List[str]] = Field(None, max_items=30) # This was probably replaced by the relationship
     phone_number_public: Optional[bool] = True
     age_public: Optional[bool] = True
@@ -56,7 +56,8 @@ class UserUpdate(BaseModel):
     phone_number: Optional[str] = Field(None, max_length=20)
     introduction: Optional[str] = Field(None, max_length=1000)
     profile_image_url: Optional[str] = None
-    core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
-    interests: Optional[List[str]] = Field(None, max_items=30)
+    skills: Optional[List[str]] = []
+    interests: Optional[List[str]] = []
+    # core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
     phone_number_public: Optional[bool] = None
     age_public: Optional[bool] = None

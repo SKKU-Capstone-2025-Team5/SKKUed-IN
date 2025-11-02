@@ -33,6 +33,8 @@ def register_user(
             status_code=400,
             detail="Only SKKU email addresses are allowed for registration.",
         )
+    if not user_in.profile_image_url:
+        user_in.profile_image_url = "/images/basic_profile.png"
     user = crud.user.create(db, obj_in=user_in)
     return user
 
@@ -52,7 +54,7 @@ def login_user(
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data={"sub": user.email, "user_id": user.id}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 

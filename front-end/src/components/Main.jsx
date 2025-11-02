@@ -49,7 +49,7 @@ function Main() {
         }
 
         // 2. fetch 요청에 'Authorization' 헤더 추가하기
-        const response = await fetch('http://127.0.0.1:8000/api/v1/contests', {
+        const response = await fetch('/api/v1/contests', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

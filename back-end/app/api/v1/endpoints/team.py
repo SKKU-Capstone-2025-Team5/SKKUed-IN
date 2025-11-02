@@ -1,6 +1,6 @@
 from typing import List, Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
 
 from app import crud, schemas
@@ -23,6 +23,17 @@ def create_team(
     """
     team = crud.team.create_team(db=db, team_in=team_in, leader_id=current_user.id)
     return team
+
+@router.get("/my", response_model=List[schemas.TeamRead])
+def read_my_teams(
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_user),
+) -> Any:
+    """
+    Retrieve all teams where the current user is a leader or a member.
+    """
+    teams = crud.team.get_teams_by_user(db, user_id=current_user.id)
+    return teams
 
 @router.get("/public", response_model=List[schemas.TeamRead])
 def read_public_teams(
@@ -109,7 +120,7 @@ def apply_to_team(
 @router.post("/{team_id}/invite", response_model=schemas.InvitationRead, status_code=status.HTTP_201_CREATED)
 def invite_to_team(
     team_id: int,
-    email: str,
+    user_id_to_invite: int = Body(..., embed=True),
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
@@ -121,11 +132,12 @@ def invite_to_team(
         raise HTTPException(status_code=404, detail="Team not found")
     if team.leader_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    
-    # Check if user is already a member or has a pending invitation
-    # For simplicity, we'll allow multiple invitations for now, but a real app might prevent this
-    
-    invitation = crud.team.create_invitation(db, team_id=team_id, email=email)
+
+    user_to_invite = db.query(User).filter(User.id == user_id_to_invite).first()
+    if not user_to_invite:
+        raise HTTPException(status_code=404, detail="User to invite not found")
+
+    invitation = crud.team.create_invitation(db, team_id=team_id, email=user_to_invite.email)
     return invitation
 
 @router.post("/invitations/{token}/respond", response_model=schemas.TeamMemberRead)

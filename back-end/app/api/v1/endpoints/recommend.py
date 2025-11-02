@@ -20,8 +20,10 @@ def recommend_users(
     """
     Recommend users to the current user.
     """
-    users = crud.user.get_multi(db)
-    
+    users = crud.user.get_multi(db, limit=None)
+    print(f"[DEBUG] Total users fetched: {len(users)}")
+    print(f"[DEBUG] Current user ID: {current_user.id}")
+
     if not users:
         return []
 
@@ -37,6 +39,7 @@ def recommend_users(
         for user in users
     ]
     users_df = pd.DataFrame(user_data)
+    print(f"[DEBUG] Users DataFrame head:\n{users_df.head()}")
 
     # Configure and run the matcher
     cfg = MatchConfig(topk=5) # Get top 5 recommendations
@@ -44,10 +47,12 @@ def recommend_users(
 
     try:
         recommended_user_info = matcher.topk_for(current_user.id)
+        print(f"[DEBUG] Recommended user info length: {len(recommended_user_info)}")
         recommended_user_ids = [user['user_id'] for user in recommended_user_info]
         
         # Fetch full user objects from the database
         recommended_users = crud.user.get_multi_by_ids(db, ids=recommended_user_ids)
+        print(f"[DEBUG] Recommended users being returned: {recommended_users}")
         return recommended_users
     except ValueError as e:
         # This can happen if the current user is not in the user list for some reason

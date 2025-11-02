@@ -12,6 +12,7 @@ app = FastAPI(title="Capstone Project team5 API")
 
 # Mount static files directory
 app.mount("/static/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
+app.mount("/images", StaticFiles(directory="../front-end/public/images"), name="images")
 
 # Set all CORS enabled origins
 origins = [

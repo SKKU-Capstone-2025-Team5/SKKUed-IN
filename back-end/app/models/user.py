@@ -26,6 +26,11 @@ class User(Base):
     is_superuser = Column(Boolean(), default=False)
     profile_image_url = Column(String, nullable=True)
     major = Column(String, nullable=True)
+    age = Column(String, nullable=True) # Added missing column
+    phone_number = Column(String, nullable=True) # Added missing column
+    introduction = Column(String, nullable=True) # Added missing column
+    phone_number_public = Column(Boolean(), default=True) # Added missing column
+    age_public = Column(Boolean(), default=True) # Added missing column
 
     skills = relationship("Skill", secondary=user_skill_association, back_populates="users")
     interests = relationship("Interest", secondary=user_interest_association, back_populates="users")
@@ -38,17 +43,3 @@ class User(Base):
         back_populates="participants",
     )
     notifications = relationship("Notification", back_populates="recipient")
-
-
-class Skill(Base):
-    __tablename__ = "skill"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    users = relationship("User", secondary=user_skill_association, back_populates="skills")
-
-
-class Interest(Base):
-    __tablename__ = "interest"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    users = relationship("User", secondary=user_interest_association, back_populates="interests")

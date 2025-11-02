@@ -1,6 +1,8 @@
 import sys
 from os.path import abspath, dirname, join
-sys.path.insert(0, dirname(dirname(abspath(__file__))))
+
+# Add the back-end directory to sys.path
+sys.path.insert(0, dirname(dirname(abspath(__file__)))) # Adds back-end directory
 
 from dotenv import load_dotenv
 import os
@@ -40,6 +42,10 @@ from app.db.base import Base
 from app.models.user import User # Import your models here
 from app.models.team import Team, TeamMember, OpenPosition, Invitation
 from app.models.notification import Notification
+from app.models.contest import Contest # Added missing model import
+from app.models.message import Message # Added missing model import
+from app.models.skill import Skill # Added missing model import
+from app.models.interest import Interest # Added missing model import
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

@@ -11,6 +11,7 @@ import MyTeams from './components/MyTeams';
 import Messenger from './components/Messenger';
 import CreateTeam from './components/CreateTeam';
 import ContestDetail from './components/ContestDetail.jsx'; 
+import TeamDetail from './components/TeamDetail';
 
 import './App.css';
 
@@ -31,6 +32,7 @@ function App() {
               <Route path="/my-page" element={<Profile />} />
               <Route path="/contests/:id" element={<ContestDetail />} />
               <Route path="/teams/create" element={<CreateTeam />} />
+              <Route path="/teams/:id" element={<TeamDetail />} />
             </Route>
           </Route>
         </Routes>

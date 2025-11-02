@@ -21,7 +21,7 @@ function Login() {
     params.append('password', password);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/login', params, {
+      const response = await axios.post('/api/v1/auth/login', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -70,7 +70,7 @@ function Login() {
               disabled={loading}
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} className="login-button">
             {loading ? 'Logging in...' : 'Login'}
           </button>
                   <p className="switch-form">
