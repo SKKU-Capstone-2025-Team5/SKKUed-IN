@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, HttpUrl
-from app.models.team import TeamStatus, TeamMemberRole, TeamMemberStatus, InvitationStatus
-<<<<<<< HEAD
+
 from app.schemas.user import UserInDBBase # Import UserInDBBase
 
 # Team Schemas
@@ -30,7 +29,7 @@ class TeamRead(TeamBase):
     leader: UserInDBBase # Add this line
     created_at: datetime
     updated_at: Optional[datetime] = None
-<<<<<<< HEAD
+
     members: List["TeamMemberRead"] = [] # Add this line
 
     class Config:
