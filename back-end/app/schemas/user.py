@@ -16,6 +16,13 @@ class UserBase(BaseModel):
     age_public: Optional[bool] = True
 
 
+class UserCreate(UserBase):
+    password: str
+    is_superuser: bool = False
+    skills: Optional[List[str]] = []
+    interests: Optional[List[str]] = []
+
+
 class UserInDBBase(UserBase):
     id: Optional[int] = None
     class Config:
