@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "SKKUed-IN"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = "your_super_secret_key_here"
-<<<<<<< HEAD
+
     DATABASE_URL: str = f"sqlite:///{os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test.db')}"
     
     ALGORITHM: str = "HS256"
