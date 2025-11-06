@@ -36,7 +36,8 @@ class User(Base):
     interests = relationship("Interest", secondary=user_interest_association, back_populates="users")
 
     led_teams = relationship("Team", back_populates="leader")
-    teams = relationship("TeamMember", back_populates="user")
+    teams = relationship("Team", secondary="team_members", back_populates="users", viewonly=True)
+    team_memberships = relationship("TeamMember", back_populates="user")
     conversations = relationship(
         "Conversation",
         secondary="conversation_participant",
