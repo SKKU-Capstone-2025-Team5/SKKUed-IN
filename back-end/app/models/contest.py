@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 class Contest(Base):
@@ -12,3 +13,5 @@ class Contest(Base):
     ex_start = Column(Date)
     ex_end = Column(Date)
     ex_flag = Column(Integer)
+
+    teams = relationship("Team", back_populates="contest")

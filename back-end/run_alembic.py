@@ -1,6 +1,5 @@
 import sys
-from alembic.config import Config
-from alembic import command
+from alembic.config import Config, CommandLine
 
 def run_alembic_command(args):
     alembic_cfg = Config("alembic.ini")

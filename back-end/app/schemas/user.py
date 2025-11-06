@@ -13,19 +13,20 @@ class UserBase(BaseModel):
     age: Optional[str] = Field(None, max_length=50)
     phone_number: Optional[str] = Field(None, max_length=20)
     introduction: Optional[str] = Field(None, max_length=1000)
+<<<<<<< HEAD
     profile_image_url: Optional[str] = None
     # core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
     # interests: Optional[List[str]] = Field(None, max_items=30) # This was probably replaced by the relationship
     phone_number_public: Optional[bool] = True
     age_public: Optional[bool] = True
 
-# Properties to receive via API on creation
 class UserCreate(UserBase):
     password: str
     is_superuser: bool = False
     skills: Optional[List[str]] = []
     interests: Optional[List[str]] = []
 
+<<<<<<< HEAD
 class UserInDBBase(UserBase):
     id: Optional[int] = None
     class Config:
@@ -34,6 +35,7 @@ class UserInDBBase(UserBase):
     class Config:
         from_attributes = True
 
+<<<<<<< HEAD
 
 
 
@@ -46,7 +48,6 @@ class User(UserInDBBase):
 class UserInDB(User):
     hashed_password: str
 
-# Properties to receive via API on update
 class UserUpdate(BaseModel):
     password: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -55,9 +56,15 @@ class UserUpdate(BaseModel):
     age: Optional[str] = Field(None, max_length=50)
     phone_number: Optional[str] = Field(None, max_length=20)
     introduction: Optional[str] = Field(None, max_length=1000)
+<<<<<<< HEAD
     profile_image_url: Optional[str] = None
     skills: Optional[List[str]] = []
     interests: Optional[List[str]] = []
     # core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
+=======
+    profile_image_url: Optional[HttpUrl] = None
+    core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
+    interests: Optional[List[str]] = Field(None, max_items=30)
+>>>>>>> upstream/develop
     phone_number_public: Optional[bool] = None
     age_public: Optional[bool] = None
