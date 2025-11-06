@@ -7,8 +7,7 @@ from app.models.interest import Interest
 from app.schemas.user import UserCreate, UserBase, UserUpdate # Import UserBase for update
 from typing import Any, Dict, Optional, Union, List
 
-def get_user_by_email(db: Session, email: str):
-<<<<<<< HEAD
+
     return db.query(User).options(selectinload(User.skills), selectinload(User.interests)).filter(User.email == email).first()
 
 
@@ -25,7 +24,7 @@ def create(db: Session, *, obj_in: UserCreate) -> User:
     default_profile_image = "/images/basic_profile.png"
     profile_image_to_use = obj_in.profile_image_url if obj_in.profile_image_url else default_profile_image
 
-<<<<<<< HEAD
+
     db_obj = User(
         email=obj_in.email,
         hashed_password=get_password_hash(obj_in.password),
