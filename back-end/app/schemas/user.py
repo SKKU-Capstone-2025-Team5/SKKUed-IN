@@ -46,6 +46,14 @@ class User(UserInDBBase):
 class UserInDB(User):
     hashed_password: str
 
+#------(RecommendedUser Schema)
+class RecommendedUser(User):
+    similarity: float
+
+#------
+
+
+
 # Properties to receive via API on update
 class UserUpdate(BaseModel):
     password: Optional[str] = None
