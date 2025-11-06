@@ -5,23 +5,31 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+#from app import crud, schemas
+from app import crud
 from app.api import deps
 #from app.models.user import User
 from app.models.user import User as UserModel
+from app.schemas.user import RecommendedUser, User as UserSchema
+from app.schemas.skill import Skill as SkillSchema
+from app.schemas.interest import Interest as InterestSchema
 from app.recsys.matcher import UserMatcher, MatchConfig
 
 router = APIRouter()
 
 
 #@router.get("/", response_model=List[schemas.User])
-@router.get("/", response_model=List[schemas.RecommendedUser])
+#@router.get("/", response_model=List[schemas.RecommendedUser])
+@router.get("/", response_model=List[RecommendedUser])
 def recommend_users(
     db: Session = Depends(deps.get_db),
     #current_user: User = Depends(deps.get_current_user),
     current_user: UserModel = Depends(deps.get_current_user),
     user_id: Optional[int] = Query(None, description="디버그용: 특정 user_id로 강제 추천"), #str -> int, DB에서는 INT임
     topk: int = Query(5, ge=1, le=50, description="반환할 추천 수"),
+    w_major: Optional[float] = Query(None),
+    w_skills: Optional[float] = Query(None),
+    w_interests: Optional[float] = Query(None),
 ) -> Any:
     """
     Recommend users to the current user.
@@ -89,7 +97,13 @@ def recommend_users(
         raise HTTPException(status_code=404, detail=f"user_id '{base_user_id}' not found")
 
     # 4) 매처 실행
-    cfg = MatchConfig(topk=topk)
+    #cfg = MatchConfig(topk=topk)
+    cfg = MatchConfig.from_values(
+        w_major=w_major,
+        w_skills=w_skills,
+        w_interests=w_interests,
+        topk=topk
+    )
     matcher = UserMatcher(users_df, cfg)
 
     try:
@@ -114,10 +128,12 @@ def recommend_users(
         rec_models.sort(key=lambda m: id_pos.get(m.id, 1e9))
 
         # RecommendedUser 스키마로 변환해 반환
+        '''
         out = []
         for m in rec_models:
             out.append(
-                schemas.RecommendedUser(
+                #schemas.RecommendedUser(
+                RecommendedUser(
                     id=m.id,
                     email=m.email,
                     full_name=m.full_name,
@@ -129,6 +145,30 @@ def recommend_users(
                 )
             )
         return out
+        '''
+        sim_map = {r["user_id"]: float(r["similarity"]) for r in rec_info}
+
+        resp: List[RecommendedUser] = []
+        for m in rec_models:
+            resp.append(
+                RecommendedUser(
+                    id=m.id,
+                    email=m.email,
+                    full_name=m.full_name,
+                    major=m.major,
+                    age=m.age,
+                    phone_number=m.phone_number,
+                    introduction=m.introduction,
+                    profile_image_url=m.profile_image_url,
+                    phone_number_public=m.phone_number_public,
+                    age_public=m.age_public,
+                    skills=[SkillSchema(id=s.id, name=s.name) for s in m.skills],
+                    interests=[InterestSchema(id=i.id, name=i.name) for i in m.interests],
+                    similarity=round(sim_map.get(m.id, 0.0), 4),
+                )
+            )
+
+        return resp
         #--------------
         #return rec_models
     except ValueError as e:
