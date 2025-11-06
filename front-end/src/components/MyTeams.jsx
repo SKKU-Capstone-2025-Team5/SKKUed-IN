@@ -93,7 +93,7 @@ function MyTeams() {
                     <Link to={`/teams/${team.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{team.name}</Link>
                   </Typography>
                   <Typography variant="body2" color="textSecondary" paragraph>{team.description}</Typography>
-                  <Typography><strong>Members:</strong> {team.members ? team.members.length : 0} / {team.member_limit}</Typography>
+                  
                   <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
                     <Chip label={team.status} color={team.status.toLowerCase() === 'recruiting' ? 'success' : 'default'} />
                   </Box>

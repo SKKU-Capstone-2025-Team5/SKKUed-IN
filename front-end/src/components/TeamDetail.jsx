@@ -3,20 +3,35 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import {
-  Container, Typography, Card, CardContent, Button, Grid, Avatar, List, ListItem, ListItemText,
-  Chip, CircularProgress, Alert, Box, ListItemAvatar
+  Typography, Button, CircularProgress, Alert, Box, Avatar, Select, MenuItem, FormControl, InputLabel, Chip,
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField
 } from '@mui/material';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import './TeamDetail.css';
-
-const BACKEND_URL = 'http://127.0.0.1:8000'; // Define your backend URL
 
 function TeamDetail() {
   const { id } = useParams();
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [recommendations, setRecommendations] = useState([]);
-  const [recLoading, setRecLoading] = useState(false);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editedDescription, setEditedDescription] = useState('');
+  const [teamStatus, setTeamStatus] = useState(''); // State for editable status
+  const [editedMemberLimit, setEditedMemberLimit] = useState(0);
+  const [calendarDate, setCalendarDate] = useState(new Date()); // State for calendar
+  const [openEtcPopup, setOpenEtcPopup] = useState(false); // State for Etc popup
+
+  const getUserId = () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return null;
+    try {
+      return jwtDecode(token).user_id;
+    } catch (e) {
+      return null;
+    }
+  };
+  const loggedInUserId = getUserId();
 
   const fetchTeamDetails = async () => {
     setLoading(true);
@@ -28,6 +43,9 @@ function TeamDetail() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTeam(response.data);
+      setEditedDescription(response.data.description || '');
+      setTeamStatus(response.data.status); // Set initial status
+      setEditedMemberLimit(response.data.member_limit);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -35,231 +53,241 @@ function TeamDetail() {
     }
   };
 
-  const fetchRecommendations = async () => {
-    setRecLoading(true);
-    setError('');
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setError('You must be logged in to fetch recommendations.');
-      setRecLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/v1/recommend/', {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error('Failed to fetch recommendations');
-      const data = await response.json();
-      setRecommendations(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setRecLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchTeamDetails();
   }, [id]);
 
-  useEffect(() => {
-    if (team && !loading) {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.warn('Access token not found, cannot fetch recommendations automatically.');
-        return;
-      }
-
-      const isTeamFull = team.members && team.members.length >= team.member_limit;
-      let loggedInUserId = null;
-      try {
-        const decodedToken = jwtDecode(token);
-        loggedInUserId = decodedToken.user_id;
-      } catch (e) {
-        console.error('Error decoding token:', e);
-        return; // Exit if token is invalid
-      }
-      const isLeader = team.leader_id === loggedInUserId;
-
-      if (isLeader && !isTeamFull && recommendations.length === 0) {
-        fetchRecommendations();
-      }
-    }
-  }, [team, loading, recommendations.length]); // Added recommendations.length to dependencies
-
-  const handleInviteUser = async (userId) => {
-    setError('');
-    const token = localStorage.getItem('accessToken');
-    if (!token || !team) {
-      setError('Cannot invite user. Make sure you are logged in and have a team selected.');
-      return;
-    }
-
+  const handleDescriptionSave = async () => {
     try {
-      const response = await fetch(`/api/v1/teams/${team.id}/invite`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ user_id_to_invite: userId }),
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorData;
-        try {
-          errorData = JSON.parse(errorText);
-        } catch (e) {
-          throw new Error(errorText || 'Failed to invite user');
-        }
-        throw new Error(errorData.detail || 'Failed to invite user');
-      }
-      alert('Invitation sent successfully!');
-      fetchTeamDetails();
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error('Authentication token not found. Please log in.');
+
+      await axios.put(`/api/v1/teams/${id}`, 
+        { description: editedDescription },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTeam(prevTeam => ({ ...prevTeam, description: editedDescription }));
+      setIsEditingDescription(false);
     } catch (err) {
       setError(err.message);
-      alert(`Error inviting user: ${err.message}`);
+    }
+  };
+
+  const handleStatusChange = async (event) => {
+    const newStatus = event.target.value;
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error('Authentication token not found. Please log in.');
+
+      await axios.put(`/api/v1/teams/${id}`, 
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTeam(prevTeam => ({ ...prevTeam, status: newStatus }));
+      setTeamStatus(newStatus); // Update local state
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleMemberLimitChange = async (event) => {
+    const newLimit = event.target.value;
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error('Authentication token not found. Please log in.');
+
+      await axios.put(`/api/v1/teams/${id}`, 
+        { member_limit: newLimit },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTeam(prevTeam => ({ ...prevTeam, member_limit: newLimit }));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const [etcLinkInput, setEtcLinkInput] = useState('');
+
+  const handleEtcLinkOpen = () => {
+    setOpenEtcPopup(true);
+  };
+
+  const handleEtcLinkClose = () => {
+    setOpenEtcPopup(false);
+    setEtcLinkInput(''); // Clear input on close
+  };
+
+  const handleEtcLinkSubmit = () => {
+    if (etcLinkInput) {
+      window.open(etcLinkInput, '_blank');
+      handleEtcLinkClose();
     }
   };
 
   if (loading) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error}</Alert>;
+  if (error) return <Alert severity="error">Error: {error}</Alert>;
   if (!team) return <Alert severity="info">Team not found.</Alert>;
 
-  const isTeamFull = team.members && team.members.length >= team.member_limit;
-  
-  let loggedInUserId = null;
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    try {
-      const decodedToken = jwtDecode(token);
-      loggedInUserId = decodedToken.user_id;
-    } catch (e) {
-      console.error('Error decoding token in render:', e);
-      // Optionally handle invalid token, e.g., clear token and redirect to login
-    }
-  }
   const isLeader = team.leader_id === loggedInUserId;
 
-    return (
-      <Container className="team-detail-container" sx={{ backgroundColor: '#f4f7f6', minHeight: '100vh', py: 3 }}>
-        <Box className="team-header">
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>{team.name}</Typography>
-          <Typography variant="subtitle1" color="textSecondary">{team.description}</Typography>
-          {team.members && team.members.length > 0 && (
-            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-              {team.members.map(member => (
-                <Avatar 
-                  key={member.id} 
-                  src={member.user.profile_image_url || '/images/basic_profile.png'} 
-                  alt={member.user.full_name}
-                  sx={{ width: 56, height: 56 }} // Increased size
-                />
-              ))}
-            </Box>
-          )}
+  const teamStatuses = ["recruiting", "active", "archived"];
+
+  return (
+    <div className="team-detail-container">
+      <div className="team-detail-header">
+        <Box className="header-left">
+          <Typography variant="h4" className="team-name">{team.name}</Typography>
+          <Box className="sub-profiles">
+            {team.members && team.members.map(member => (
+              <Avatar key={member.id} sx={{ width: 40, height: 40, bgcolor: '#e0e0e0' }}>
+                {member.user.full_name ? member.user.full_name[0] : ''}
+              </Avatar>
+            ))}
+          </Box>
         </Box>
-  
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={8}> {/* Main content area */}
-            <Grid container spacing={3}> {/* Nested Grid for Team Info and Team Space */}
-              <Grid item xs={12}> {/* Team Info */}
-                <Card className="team-info-card">
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Team Information</Typography>
-                    <Typography><strong>Status:</strong> {team.status}</Typography>
-                    <Typography><strong>Members:</strong> {team.members ? team.members.length : 0} / {team.member_limit}</Typography>
-                  </CardContent>
-                </Card>
-                <Card className="team-members-card">
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Team Members</Typography>
-                    <List>
-                      {team.members && team.members.length > 0 ? (
-                        team.members.map(member => (
-                          <ListItem key={member.id}>
-                            <ListItemText primary={member.user.full_name} secondary={`Role: ${member.role}, Status: ${member.status}`} />
-                          </ListItem>
-                        ))
-                      ) : (
-                        <Typography>No members in this team yet.</Typography>
-                      )}
-                    </List>
-                  </CardContent>
-                </Card>
-              </Grid>
-  
-                          <Grid item xs={12}> {/* Team Space Placeholder */}
-                            <Box
-                              sx={{
-                                minHeight: 200, // Make it larger
-                                p: 3, // Add padding
-                                border: '1px dashed #ccc', // Add a dashed border
-                                borderRadius: 2,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                textAlign: 'center',
-                                backgroundColor: '#fff',
-                                ml: 6, // Push even more to the right
-                              }}
-                            >
-                              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Team Space</Typography>
-                              <Typography variant="body2" color="textSecondary">This section is reserved for team activities.</Typography>
-                            </Box>
-                          </Grid>            </Grid>
-          </Grid>
-  
-          {isLeader && !isTeamFull && (
-            <Grid item xs={12} md={4} sx={{ ml: 'auto' }}> {/* Recommendations on the right */}
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Recruit Members</Typography>
-                  {recLoading && <CircularProgress size={24} sx={{ mt: 2, display: 'block', mx: 'auto' }} />} 
-                  {recommendations.length > 0 && (
-                    <Box className="recommendations-section">
-                      <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>Recommended Teammates</Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                        {recommendations.map(user => (
-                            <Card elevation={1} key={user.id}>
-                              <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-                                <Avatar 
-                                  src={user.profile_image_url ? `${BACKEND_URL}${user.profile_image_url}` : '/images/basic_profile.png'} 
-                                  alt={user.full_name}
-                                  sx={{ width: 60, height: 60, mb: 1 }} // Larger avatar for individual cards
-                                />
-                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{user.full_name}</Typography>
-                                <Typography variant="body2" color="textSecondary">{user.major}</Typography>
-                                <Button 
-                                  size="small" 
-                                  variant="contained" 
-                                  onClick={() => handleInviteUser(user.id)}
-                                  sx={{
-                                    mt: 1,
-                                    backgroundColor: '#A5D6A7',
-                                    color: 'white',
-                                    fontWeight: 'bold',
-                                    textTransform: 'none',
-                                    '&:hover': {
-                                      backgroundColor: '#66BB6A'
-                                    }
-                                  }}
-                                >
-                                  Invite
-                                </Button>
-                              </CardContent>
-                            </Card>
-                        ))}
-                      </Box>
-                                      </Box>
-                                  )}
-                                </CardContent>              </Card>
-            </Grid>
-          )}
-        </Grid>
-      </Container>
-    );
-  }
+
+        <Box className="header-right">
+          <Box className="description-and-recommendations">
+            <Box className="description-block">
+              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}> {/* Container for buttons */}
+                {isLeader && (isEditingDescription ? (
+                  <Button variant="contained" onClick={handleDescriptionSave}>Save</Button>
+                ) : (
+                  <>
+                    <Button variant="contained" color="primary">Connect Contest</Button>
+                    <Button variant="outlined" onClick={() => setIsEditingDescription(true)}>Edit</Button>
+                  </>
+                ))}
+              </Box>
+              {isEditingDescription ? (
+                <textarea
+                  className="description-input"
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                />
+              ) : (
+                <Typography 
+                  className="description-input"
+                  onClick={() => isLeader && setIsEditingDescription(true)}
+                  sx={{ cursor: isLeader ? 'pointer' : 'default', minHeight: '80px' }}
+                >
+                  {team.description || "Click to add description"}
+                </Typography>
+              )}
+            </Box>
+            <Box className="recommendations-section-header">
+              <Typography variant="h6">Recommended Members</Typography>
+              <Typography>Member recommendations coming soon!</Typography>
+            </Box>
+          </Box>
+        </Box>
+      </div>
+
+      <div className="team-detail-body">
+        <Box className="team-info-box">
+          <Typography variant="h6">Team Information</Typography>
+          <Typography>
+            {isLeader ? (
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="team-status-select-label">Status</InputLabel>
+                <Select
+                  labelId="team-status-select-label"
+                  id="team-status-select"
+                  value={teamStatus}
+                  onChange={handleStatusChange}
+                  label="Status"
+                >
+                  {teamStatuses.map(status => (
+                    <MenuItem key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <span>{team.status.charAt(0).toUpperCase() + team.status.slice(1)}</span>
+            )}
+          </Typography>
+          <Typography>
+            {isLeader ? (
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="member-limit-select-label">Member Limit</InputLabel>
+                <Select
+                  labelId="member-limit-select-label"
+                  id="team-member-limit-select"
+                  value={editedMemberLimit}
+                  onChange={handleMemberLimitChange}
+                  label="Member Limit"
+                >
+                  {[...Array(10).keys()].map(i => (
+                    <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <span>{team.member_limit}</span>
+            )}
+          </Typography>
+        </Box>
+
+        <Box className="team-members-box" sx={{ mt: 1 }}>
+          <Typography variant="h6">Team Members</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+            <Chip
+              avatar={<Avatar>{team.leader.full_name[0]}</Avatar>}
+              label={`${team.leader.full_name} (Leader)`}
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+            {team.members && team.members.filter(m => m.user.id !== team.leader_id).map(member => (
+              <Chip
+                key={member.id}
+                avatar={<Avatar>{member.user.full_name[0]}</Avatar>}
+                label={`${member.user.full_name} (${member.status})`}
+                variant="outlined"
+                size="small"
+              />
+            ))}
+          </Box>
+        </Box>
+
+        <Box className="calendar-section">
+          <Typography variant="h6">Calendar</Typography>
+          <Calendar onChange={setCalendarDate} value={calendarDate} />
+        </Box>
+
+        <Box className="links-section">
+          <Typography variant="h6">Integrations</Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+            <Button variant="outlined" onClick={() => window.open('https://notion.so', '_blank')}>Notion</Button>
+            <Button variant="outlined" onClick={() => window.open('https://github.com', '_blank')}>GitHub</Button>
+            <Button variant="outlined" onClick={() => window.open('https://docs.google.com', '_blank')}>Docs</Button>
+            <Button variant="outlined" onClick={() => setOpenEtcPopup(true)}>Etc</Button>
+          </Box>
+        </Box>
+      </div>
+
+      <Dialog open={openEtcPopup} onClose={handleEtcLinkClose}>
+        <DialogTitle>Enter Custom Link</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="etc-link"
+            label="Link URL"
+            type="url"
+            fullWidth
+            variant="standard"
+            value={etcLinkInput}
+            onChange={(e) => setEtcLinkInput(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEtcLinkClose}>Cancel</Button>
+          <Button onClick={handleEtcLinkSubmit}>Go</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
 export default TeamDetail;

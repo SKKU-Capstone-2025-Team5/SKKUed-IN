@@ -14,7 +14,8 @@
 
 .sidebar-header {
   display: flex;
-  align-items: center;
+  flex-direction: column; /* Stack logo and title vertically */
+  align-items: center; /* Center horizontally */
   margin-bottom: 2rem;
 }
 

@@ -108,3 +108,18 @@ def update_user(
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def search_users(db: Session, query: str) -> List[User]:
+    # First, try to find an exact match for full_name or email
+    exact_match = db.query(User).filter(
+        (User.full_name == query) | (User.email == query)
+    ).first()
+
+    if exact_match:
+        return [exact_match]
+    
+    # If no exact match, fall back to partial, case-insensitive matching
+    return db.query(User).filter(
+        User.full_name.ilike(f"%{query}%") |
+        User.email.ilike(f"%{query}%")
+    ).all()

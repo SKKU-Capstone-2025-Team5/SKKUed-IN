@@ -91,7 +91,7 @@ function Register() {
               disabled={loading}
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} className="login-button">
             {loading ? 'Registering...' : 'Register'}
           </button>
           <p className="switch-form">

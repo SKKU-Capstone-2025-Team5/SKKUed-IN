@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    BASE_URL: str = "http://127.0.0.1:8000" # Add this line
+
     # Email
     MAIL_USERNAME: str | None = None
     MAIL_PASSWORD: str | None = None

@@ -8,7 +8,7 @@ from app.api import deps
 from app.models.user import User
 from app.models.message import Conversation # Import the model
 from app.api.v1.endpoints.websocket import manager # New import
-import json # Needed to serialize MessageRead to JSON
+
 
 router = APIRouter()
 
@@ -79,7 +79,7 @@ async def send_message( # Make it async
     # Broadcast message to participants via WebSocket
     participant_ids = [p.id for p in conversation.participants]
     message_read_schema = schemas.MessageRead.model_validate(message) # Convert model to schema
-    await manager.broadcast(json.dumps(message_read_schema.model_dump()), participant_ids) # Broadcast JSON string
+    await manager.broadcast(message_read_schema.model_dump_json(), participant_ids) # Broadcast JSON string
 
     return message
 

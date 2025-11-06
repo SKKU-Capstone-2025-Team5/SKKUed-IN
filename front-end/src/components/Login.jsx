@@ -29,6 +29,17 @@ function Login() {
 
       if (response.data.access_token) {
         localStorage.setItem('accessToken', response.data.access_token);
+
+        // Fetch user details after successful login
+        const userResponse = await axios.get('/api/v1/users/me', {
+          headers: {
+            'Authorization': `Bearer ${response.data.access_token}`,
+          },
+        });
+        localStorage.setItem('user', JSON.stringify(userResponse.data));
+        console.log('User object stored in localStorage:', JSON.parse(localStorage.getItem('user')));
+        console.log('User ID from localStorage:', JSON.parse(localStorage.getItem('user'))?.id);
+
         navigate('/find-project');
       }
     } catch (err) {

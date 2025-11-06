@@ -26,6 +26,7 @@ class TeamRead(TeamBase):
     id: int
     status: TeamStatus
     leader_id: int
+    leader: UserInDBBase # Add this line
     created_at: datetime
     updated_at: Optional[datetime] = None
     members: List["TeamMemberRead"] = [] # Add this line
