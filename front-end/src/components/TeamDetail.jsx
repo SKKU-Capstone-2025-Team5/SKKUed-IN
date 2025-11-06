@@ -232,7 +232,7 @@ function TeamDetail() {
           <Typography variant="h6">Team Members</Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
             <Chip
-              avatar={<Avatar>{team.leader.full_name[0]}</Avatar>}
+              avatar={<Avatar>{team.leader?.full_name ? team.leader.full_name[0] : ''}</Avatar>}
               label={`${team.leader.full_name} (Leader)`}
               color="primary"
               variant="outlined"
