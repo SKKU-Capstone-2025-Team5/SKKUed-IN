@@ -8,6 +8,7 @@ from app.schemas.user import UserCreate, UserBase, UserUpdate # Import UserBase 
 from typing import Any, Dict, Optional, Union, List
 
 
+def get_user_by_email(db: Session, email: str):
     return db.query(User).options(selectinload(User.skills), selectinload(User.interests)).filter(User.email == email).first()
 
 
