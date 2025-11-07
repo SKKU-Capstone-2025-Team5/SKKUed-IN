@@ -1,10 +1,9 @@
 /* General container for the Create Team page */
 .create-team-container {
   padding: 2rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  margin: 2rem auto;
+  background-color: #f4f7f6; /* Gray from find-project page */
+  /* border-radius: 8px; */ /* Removed border-radius */
+  margin: 0 auto; /* Set top margin to 0 */
   max-width: 800px;
 }
 
@@ -23,10 +22,10 @@
 .recommendations-list {
   list-style: none;
   padding: 0;
-  /* Keep grid for overall list layout, but make items stack vertically */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  display: flex;
+  overflow-x: auto;
   gap: 1rem;
+  justify-content: center;
 }
 
 .recommendation-item {
@@ -36,6 +35,9 @@
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   transition: transform 0.2s;
+  flex-shrink: 0; /* Prevent items from shrinking */
+  flex-grow: 0; /* Prevent items from growing */
+  flex-basis: 180px; /* Set a slightly smaller fixed basis for each item */
   display: flex; /* Make it a flex container */
   flex-direction: column; /* Stack children vertically */
   align-items: center; /* Center items horizontally */
@@ -49,6 +51,7 @@
 .recommendation-item .MuiListItemText-primary { /* Target Material-UI primary text (name) */
   font-weight: bold;
   margin-bottom: 0.25rem;
+  flex-grow: 1;
 }
 
 .recommendation-item .MuiListItemText-secondary { /* Target Material-UI secondary text (email, major) */

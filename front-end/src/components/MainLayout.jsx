@@ -13,7 +13,12 @@ function MainLayout() {
   };
 
   // Function to check if a path is active
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    if (path === '/find-project') {
+      return location.pathname === '/find-project' || location.pathname.startsWith('/contests/');
+    }
+    return location.pathname === path;
+  };
 
   return (
     <div className="main-layout">

@@ -14,19 +14,19 @@
 
 .sidebar-header {
   display: flex;
-  flex-direction: column; /* Stack logo and title vertically */
-  align-items: center; /* Center horizontally */
+  flex-direction: row; /* Arrange logo and title horizontally */
+  align-items: center; /* Vertically center items */
   margin-bottom: 2rem;
 }
 
 .sidebar-logo {
-  width: 40px;
-  height: 40px;
-  margin-right: 0.5rem;
+  width: 50px; /* Increased size */
+  height: 50px; /* Increased size */
+  margin-right: 1rem; /* Increased spacing */
 }
 
 .sidebar-title {
-  font-size: 1.2rem;
+  font-size: 1.5rem; /* Increased size */
   font-weight: bold;
   color: #333;
 }
@@ -70,18 +70,18 @@
 }
 
 .logout-button {
-  background: none;
-  border: none;
+  background: none; /* Ensure no background */
+  border: none; /* Ensure no border */
   padding: 0.5rem;
-  color: #333;
+  color: #388E3C; /* Color from Register link */
   cursor: pointer;
   font-size: 0.9rem;
-  text-align: center; /* Center align the text */
+  text-align: center;
   text-decoration: none;
-  display: flex; /* For icon and text alignment */
-  align-items: center; /* For icon and text alignment */
-  justify-content: center; /* Center align content for icon and text */
-  gap: 0.5rem; /* Space between icon and text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .logout-button:hover {

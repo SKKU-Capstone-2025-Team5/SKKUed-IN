@@ -1,4 +1,6 @@
 from typing import List, Any
+from datetime import datetime
+import pandas as pd
 
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
@@ -7,6 +9,10 @@ from app import crud, schemas
 from app.api import deps
 from app.models.user import User
 from app.models.team import TeamMemberStatus, InvitationStatus
+from app.recsys.matcher import UserMatcher, MatchConfig
+from app.crud.crud_message import crud_message
+from app.schemas.message import MessageCreate, ConversationCreate
+from app.models.message import ConversationType
 
 router = APIRouter()
 
@@ -45,6 +51,19 @@ def read_public_teams(
     Retrieve public teams.
     """
     teams = crud.team.get_public_teams(db, skip=skip, limit=limit)
+    return teams
+
+@router.get("/by_contest/{contest_id}", response_model=List[schemas.TeamRead])
+def read_teams_by_contest(
+    contest_id: int,
+    db: Session = Depends(deps.get_db),
+    skip: int = 0,
+    limit: int = 100,
+) -> Any:
+    """
+    Retrieve teams by contest ID.
+    """
+    teams = crud.team.get_teams_by_contest_id(db, contest_id=contest_id, skip=skip, limit=limit)
     return teams
 
 @router.get("/{team_id}", response_model=schemas.TeamRead)
@@ -158,7 +177,18 @@ def respond_to_invitation(
         raise HTTPException(status_code=400, detail="Invitation expired")
     if invitation.status != InvitationStatus.PENDING:
         raise HTTPException(status_code=400, detail="Invitation already responded to or invalid")
-    
+
+    team = crud.team.get_team(db, team_id=invitation.team_id)
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+
+    # Find or create a DM conversation between the leader and the current user
+    participant_ids = sorted([team.leader_id, current_user.id])
+    conversation = crud_message.get_conversation_by_participants(db, participant_ids)
+    if not conversation:
+        conversation_in = ConversationCreate(participant_ids=participant_ids, type=ConversationType.DM)
+        conversation = crud_message.create_conversation(db, conversation_in=conversation_in, current_user_id=current_user.id)
+
     if accept:
         # Check if user is already a member
         if crud.team.get_team_member(db, team_id=invitation.team_id, user_id=current_user.id):
@@ -168,10 +198,31 @@ def respond_to_invitation(
         team_member_in = schemas.TeamMemberCreate(user_id=current_user.id, team_id=invitation.team_id)
         team_member = crud.team.create_team_member(db, team_member_in=team_member_in, status=TeamMemberStatus.ACCEPTED)
         crud.team.update_invitation_status(db, invitation, InvitationStatus.ACCEPTED)
+
+        # Send message to leader
+        if conversation:
+            message_content = f"Accepted invitation to join {team.name}!"
+            message_in = MessageCreate(conversation_id=conversation.id, content=message_content)
+            crud_message.create_message(db, message_in=message_in, sender_id=current_user.id)
+
         return team_member
     else:
         crud.team.update_invitation_status(db, invitation, InvitationStatus.REJECTED)
+
         raise HTTPException(status_code=200, detail="Invitation rejected") # Return 200 for rejection
+
+@router.get("/invitations/{token}/status", response_model=schemas.InvitationStatusRead)
+def get_invitation_status(
+    token: str,
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Get the status of an invitation.
+    """
+    invitation = crud.team.get_invitation_by_token(db, token=token)
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invitation not found")
+    return invitation
 
 @router.post("/{team_id}/applications/{team_member_id}/respond", response_model=schemas.TeamMemberRead)
 def respond_to_application(
