@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, HttpUrl
 from app.models.team import TeamStatus, TeamMemberRole, TeamMemberStatus, InvitationStatus
-from app.schemas.contest import Contest
+
+from app.schemas.user import UserInDBBase # Import UserInDBBase
 
 # Team Schemas
 class TeamBase(BaseModel):
@@ -26,9 +27,11 @@ class TeamRead(TeamBase):
     id: int
     status: TeamStatus
     leader_id: int
+    leader: UserInDBBase # Add this line
     created_at: datetime
     updated_at: Optional[datetime] = None
-    contest: Optional[Contest] = None
+
+    members: List["TeamMemberRead"] = [] # Add this line
 
     class Config:
         from_attributes = True
@@ -62,6 +65,7 @@ class TeamMemberRead(TeamMemberBase):
     id: int
     team_id: int
     status: TeamMemberStatus # New field
+    user: UserInDBBase # Add this line
 
     class Config:
         from_attributes = True

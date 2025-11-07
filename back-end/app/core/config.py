@@ -8,12 +8,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "SKKUed-IN"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = "your_super_secret_key_here"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    ALGORITHM: str = "HS256"
-    DATABASE_URL: str = "sqlite:///./test.db"
+
+    DATABASE_URL: str = f"sqlite:///{os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test.db')}"
     
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    BASE_URL: str = "http://127.0.0.1:8000" # Add this line
 
     # Email
     MAIL_USERNAME: str | None = None

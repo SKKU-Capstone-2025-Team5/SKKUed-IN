@@ -11,7 +11,7 @@ from app.crud.crud_notification import create_notification
 from app.crud.crud_user import get_user_by_email 
 
 def get_team(db: Session, team_id: int) -> Optional[Team]:
-    return db.query(Team).options(joinedload(Team.contest)).filter(Team.id == team_id).first()
+    return db.query(Team).options(joinedload(Team.members).joinedload(TeamMember.user), joinedload(Team.leader)).filter(Team.id == team_id).first()
 
 def get_teams_by_user(db: Session, user_id: int) -> List[Team]:
     return db.query(Team).options(joinedload(Team.contest)).join(TeamMember).filter(TeamMember.user_id == user_id).all()

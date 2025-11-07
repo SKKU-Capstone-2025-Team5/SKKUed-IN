@@ -34,6 +34,8 @@ function Main() {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('latest'); // 'latest', 'deadline'
 
   useEffect(() => {
     const fetchContests = async () => {
@@ -47,7 +49,7 @@ function Main() {
         }
 
         // 2. fetch 요청에 'Authorization' 헤더 추가하기
-        const response = await fetch('http://127.0.0.1:8000/api/v1/contests', {
+        const response = await fetch('/api/v1/contests', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -71,6 +73,23 @@ function Main() {
     fetchContests();
   }, []); // 컴포넌트 마운트 시 한 번만 실행
 
+  const filteredContests = contests.filter(contest => 
+    contest.ex_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    contest.ex_host.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const sortedContests = [...filteredContests].sort((a, b) => {
+    if (sortOrder === 'latest') {
+      return new Date(b.ex_start) - new Date(a.ex_start);
+    } else if (sortOrder === 'deadline') {
+      // Handle cases where ex_end might be null or invalid
+      const dateA = a.ex_end ? new Date(a.ex_end) : new Date('9999-12-31'); // Far future date
+      const dateB = b.ex_end ? new Date(b.ex_end) : new Date('9999-12-31'); // Far future date
+      return dateA - dateB;
+    }
+    return 0;
+  });
+
   if (loading) {
     return <div>데이터를 불러오는 중입니다...</div>;
   }
@@ -81,11 +100,28 @@ function Main() {
 
   return (
     <div className="main-container">
-      {/* ... (h1, contest-list, map 등 기존 코드) ... */}
       <h1 className="main-title">진행중인 공모전</h1>
       
+      <div className="controls-container">
+        <input 
+          type="text" 
+          placeholder="Search contests..." 
+          value={searchTerm} 
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+        <select 
+          value={sortOrder} 
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="sort-select"
+        >
+          <option value="latest">최신순</option>
+          <option value="deadline">마감일순</option>
+        </select>
+      </div>
+
       <div className="contest-list">
-        {contests.map((contest) => (
+        {sortedContests.map((contest) => (
           <div key={contest.id} className="contest-card">
             <Link to={`/contests/${contest.id}`} className="card-link">
               

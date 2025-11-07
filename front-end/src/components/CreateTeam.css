@@ -1,0 +1,97 @@
+/* General container for the Create Team page */
+.create-team-container {
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+/* Form styling */
+.create-team-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Styling for the recommendations section */
+.recommendations-section {
+  margin-top: 2rem;
+}
+
+.recommendations-list {
+  list-style: none;
+  padding: 0;
+  /* Keep grid for overall list layout, but make items stack vertically */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.recommendation-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+  display: flex; /* Make it a flex container */
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center items horizontally */
+  text-align: center; /* Center text */
+}
+
+.recommendation-item .MuiListItemAvatar-root { /* Target Material-UI Avatar container */
+  margin-bottom: 0.5rem;
+}
+
+.recommendation-item .MuiListItemText-primary { /* Target Material-UI primary text (name) */
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.recommendation-item .MuiListItemText-secondary { /* Target Material-UI secondary text (email, major) */
+  margin-bottom: 0.5rem;
+}
+
+.recommendation-item .invite-button {
+  margin-top: auto; /* Push button to the bottom */
+  width: 100%; /* Make button full width */
+}
+
+.recommendation-item:hover {
+  transform: translateY(-5px);
+}
+
+.recommendation-item h4 {
+  margin-top: 0;
+}
+
+/* Button styling */
+.invite-button {
+  margin-top: 1rem;
+}
+
+/* Green button styles */
+.green-button-contained {
+  background-color: #A5D6A7 !important; /* Login page green */
+  color: white !important;
+  text-transform: none !important; /* Ensure not all caps */
+  font-weight: bold !important; /* Ensure bold */
+}
+
+.green-button-contained:hover {
+  background-color: #66BB6A !important; /* Darker green for hover */
+}
+
+.green-button-outlined {
+  color: #A5D6A7 !important;
+  border-color: #A5D6A7 !important;
+}
+
+.green-button-outlined:hover {
+  border-color: #66BB6A !important;
+  color: #66BB6A !important;
+  background-color: rgba(102, 187, 106, 0.1) !important; /* Light green background on hover */
+}

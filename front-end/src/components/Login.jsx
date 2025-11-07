@@ -21,7 +21,7 @@ function Login() {
     params.append('password', password);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/login', params, {
+      const response = await axios.post('/api/v1/auth/login', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -29,7 +29,18 @@ function Login() {
 
       if (response.data.access_token) {
         localStorage.setItem('accessToken', response.data.access_token);
-        navigate('/main');
+
+        // Fetch user details after successful login
+        const userResponse = await axios.get('/api/v1/users/me', {
+          headers: {
+            'Authorization': `Bearer ${response.data.access_token}`,
+          },
+        });
+        localStorage.setItem('user', JSON.stringify(userResponse.data));
+        console.log('User object stored in localStorage:', JSON.parse(localStorage.getItem('user')));
+        console.log('User ID from localStorage:', JSON.parse(localStorage.getItem('user'))?.id);
+
+        navigate('/find-project');
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.detail) {
@@ -70,7 +81,7 @@ function Login() {
               disabled={loading}
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} className="login-button">
             {loading ? 'Logging in...' : 'Login'}
           </button>
                   <p className="switch-form">

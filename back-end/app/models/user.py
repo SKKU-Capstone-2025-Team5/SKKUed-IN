@@ -1,36 +1,46 @@
-from sqlalchemy import Column, Integer, String, Boolean, JSON
+from sqlalchemy import Column, Integer, String, Boolean, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
-from app.models.message import conversation_participant_association
+
+
+user_skill_association = Table(
+    'user_skill', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('skill_id', Integer, ForeignKey('skill.id'))
+)
+
+user_interest_association = Table(
+    'user_interest', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('interest_id', Integer, ForeignKey('interest.id'))
+)
 
 class User(Base):
     __tablename__ = "users"
-
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
-
-    major = Column(String, nullable=True)
-    age = Column(String, nullable=True)
-    phone_number = Column(String, nullable=True)
-    introduction = Column(String(1000), nullable=True)
+    is_active = Column(Boolean(), default=True)
+    is_superuser = Column(Boolean(), default=False)
     profile_image_url = Column(String, nullable=True)
+    major = Column(String, nullable=True)
+    age = Column(String, nullable=True) # Added missing column
+    phone_number = Column(String, nullable=True) # Added missing column
+    introduction = Column(String, nullable=True) # Added missing column
+    phone_number_public = Column(Boolean(), default=True) # Added missing column
+    age_public = Column(Boolean(), default=True) # Added missing column
 
-    core_skill_tags = Column(JSON, nullable=True)
-    interests = Column(JSON, nullable=True)
-    phone_number_public = Column(Boolean, default=False)
-    age_public = Column(Boolean, default=False)
-
-    conversations = relationship(
-        "Conversation",
-        secondary=conversation_participant_association,
-        back_populates="participants",
-    )
+    skills = relationship("Skill", secondary=user_skill_association, back_populates="users")
+    interests = relationship("Interest", secondary=user_interest_association, back_populates="users")
 
     led_teams = relationship("Team", back_populates="leader")
-    team_memberships = relationship("TeamMember", back_populates="user")
     teams = relationship("Team", secondary="team_members", back_populates="users", viewonly=True)
-    notifications = relationship("Notification", back_populates="recipient", cascade="all, delete-orphan")
+    team_memberships = relationship("TeamMember", back_populates="user")
+    conversations = relationship(
+        "Conversation",
+        secondary="conversation_participant",
+        back_populates="participants",
+    )
+    notifications = relationship("Notification", back_populates="recipient")

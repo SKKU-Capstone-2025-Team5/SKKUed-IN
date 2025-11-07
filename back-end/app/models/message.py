@@ -48,6 +48,8 @@ class Message(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False)
+    file_url = Column(String, nullable=True)
+    reply_to_message_id = Column(Integer, ForeignKey("messages.id"), nullable=True)
     
     # Using JSON to store a list of user_ids who have read the message
     read_by = Column(JSON, default=[])

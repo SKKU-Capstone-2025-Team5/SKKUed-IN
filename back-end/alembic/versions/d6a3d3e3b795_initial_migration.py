@@ -27,8 +27,6 @@ def upgrade():
     sa.Column('phone_number', sa.String(), nullable=True),
     sa.Column('introduction', sa.String(length=1000), nullable=True),
     sa.Column('profile_image_url', sa.String(), nullable=True),
-    sa.Column('core_skill_tags', sa.JSON(), nullable=True),
-    sa.Column('interests', sa.JSON(), nullable=True),
     sa.Column('phone_number_public', sa.Boolean(), server_default=sa.text('0'), nullable=False),
     sa.Column('age_public', sa.Boolean(), server_default=sa.text('0'), nullable=False),
     sa.PrimaryKeyConstraint('id')

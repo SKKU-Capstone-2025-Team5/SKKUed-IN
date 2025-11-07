@@ -6,8 +6,12 @@ import Register from './components/Register';
 import Main from './components/Main';
 import Profile from './components/Profile';
 import PrivateRoute from './components/PrivateRoute';
-
+import MainLayout from './components/MainLayout';
+import MyTeams from './components/MyTeams';
+import Messenger from './components/Messenger';
+import CreateTeam from './components/CreateTeam';
 import ContestDetail from './components/ContestDetail.jsx'; 
+import TeamDetail from './components/TeamDetail';
 
 import './App.css';
 
@@ -16,30 +20,21 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          
-          {/* --- 누구나 접근 가능한 Public Routes --- */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/main" element={<Main />} />
+          <Route path="/" element={<Navigate to="/login" />} />
 
-          {/*중복된 라우트를 모두 지우고, ContestDetail 컴포넌트를 연결.
-          */}
-          <Route path="/contests/:id" element={<ContestDetail />} />
-
-
-          {/* --- 로그인이 필요한 Private Routes --- */}
-          <Route 
-            path="/profile" 
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            } 
-          />
-          
-          {/* --- 기본 경로 --- */}
-          <Route path="/" element={<Navigate to="/main" />} />
-
+          <Route element={<PrivateRoute />}>
+            <Route element={<MainLayout />}>
+              <Route path="/find-project" element={<Main />} />
+              <Route path="/my-teams" element={<MyTeams />} />
+              <Route path="/messenger" element={<Messenger />} />
+              <Route path="/my-page" element={<Profile />} />
+              <Route path="/contests/:id" element={<ContestDetail />} />
+              <Route path="/teams/create" element={<CreateTeam />} />
+              <Route path="/teams/:id" element={<TeamDetail />} />
+            </Route>
+          </Route>
         </Routes>
       </div>
     </Router>

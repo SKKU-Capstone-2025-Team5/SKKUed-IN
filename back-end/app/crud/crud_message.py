@@ -21,18 +21,23 @@ class CRUDMessage:
         return None
 
     def create_conversation(self, db: Session, conversation_in: ConversationCreate, current_user_id: int) -> Conversation:
+        print(f"[DEBUG] create_conversation called with: participant_ids={conversation_in.participant_ids}, type={conversation_in.type}, current_user_id={current_user_id}")
         if conversation_in.type == ConversationType.DM:
-            # 2명인지 확인 
+            print(f"[DEBUG] DM conversation. participant_ids length: {len(conversation_in.participant_ids) if conversation_in.participant_ids else 0}")
+            # 2명인지 확인
             if not conversation_in.participant_ids or len(conversation_in.participant_ids) != 2:
+                print(f"[DEBUG] ValueError: DM conversations must have exactly two participants. participant_ids: {conversation_in.participant_ids}")
                 raise ValueError("DM conversations must have exactly two participants.")
             
             # 같은 멤버로 이미 존재하는 대화방 있는지 확인
             existing_conv = self.get_conversation_by_participants(db, conversation_in.participant_ids)
             if existing_conv:
-                return existing_conv 
+                print(f"[DEBUG] Existing conversation found: {existing_conv.id}")
+                return existing_conv
 
             # current user가 참여자에 포함되어 있는지 확인
             if current_user_id not in conversation_in.participant_ids:
+                print(f"[DEBUG] ValueError: Current user not in participant_ids. current_user_id: {current_user_id}, participant_ids: {conversation_in.participant_ids}")
                 raise ValueError("Current user must be a participant in the DM.")
 
             # 생성

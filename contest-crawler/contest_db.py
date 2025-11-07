@@ -1,11 +1,16 @@
-# contest_db.py
-import sqlite3
+import sys
 import os
-from datetime import date
 
-DB_NAME = "../back-end/test.db"
+# Add the parent directory of 'app' to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'back-end')))
 
-TABLE_NAME = "contests"
+from app.core.config import settings
+settings.DATABASE_URL = f"sqlite:///{os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'back-end', 'test.db')}"
+
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from app.db.session import SessionLocal
+from app.models.contest import Contest
 
 def save_to_db(data_list):
     """
@@ -15,44 +20,36 @@ def save_to_db(data_list):
     if not data_list:
         print("No data to save.")
         return
-    
-    db_path = os.path.join(os.path.dirname(__file__), DB_NAME)
-    
-    if not os.path.exists(db_path):
-        print(f"Error: Database file not found at {db_path}")
-        print("Please run the FastAPI server once to initialize the database.")
-        return
 
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    insert_query = f"""
-    INSERT OR IGNORE INTO {TABLE_NAME} 
-    (ex_name, ex_link, ex_host, ex_image, ex_start, ex_end, ex_flag) 
-    VALUES (?, ?, ?, ?, ?, ?, ?);
-    """
-    
-    data_to_insert = []
-    for item in data_list:
-        start_date_str = item["ex_start"].isoformat() if isinstance(item["ex_start"], date) else None
-        end_date_str = item["ex_end"].isoformat() if isinstance(item["ex_end"], date) else None
-        
-        data_to_insert.append((
-            item["ex_name"],
-            item["ex_link"],
-            item["ex_host"],
-            item["ex_image"],
-            start_date_str,
-            end_date_str,
-            item["ex_flag"]
-        ))
-    
+    db: Session = SessionLocal()
+    inserted_count = 0
     try:
-        cursor.executemany(insert_query, data_to_insert)
-        inserted_count = cursor.rowcount
-        conn.commit()
-        print(f"Attempted to save {len(data_list)} items. Successfully inserted {inserted_count} new items into {TABLE_NAME}.")
-    except sqlite3.Error as e:
-        print(f"An error occurred while inserting data into {TABLE_NAME}: {e}")
+        for item in data_list:
+            # Check if a contest with the same ex_link already exists
+            existing_contest = db.query(Contest).filter(Contest.ex_link == item["ex_link"]).first()
+            if existing_contest:
+                # Optionally update existing contest if needed, or just skip
+                print(f"Contest with link {item['ex_link']} already exists. Skipping.")
+                continue
+
+            contest = Contest(
+                ex_name=item["ex_name"],
+                ex_link=item["ex_link"],
+                ex_host=item["ex_host"],
+                ex_image=item["ex_image"],
+                ex_start=item["ex_start"],
+                ex_end=item["ex_end"],
+                ex_flag=item["ex_flag"],
+            )
+            db.add(contest)
+            inserted_count += 1
+        db.commit()
+        print(f"Attempted to save {len(data_list)} items. Successfully inserted {inserted_count} new items into contests table.")
+    except IntegrityError as e:
+        db.rollback()
+        print(f"An IntegrityError occurred (likely duplicate ex_link): {e}")
+    except Exception as e:
+        db.rollback()
+        print(f"An unexpected error occurred while inserting data into contests table: {e}")
     finally:
-        conn.close()
+        db.close()
