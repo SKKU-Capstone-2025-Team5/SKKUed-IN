@@ -9,7 +9,7 @@
 
 .team-detail-header {
   width: 100%;
-  max-width: 900px; /* Reintroduced max-width to reduce header length */
+  max-width: 1000px; /* Reintroduced max-width to reduce header length */
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -18,13 +18,20 @@
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 180px; /* Fixed height for the header */
+  height: 220px; /* Fixed height for the header */
   overflow: hidden; /* Hide overflowing content */}
 
 .header-left {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.sub-profiles {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
 .header-right {
@@ -41,7 +48,7 @@
   gap: 1rem; /* Space between description and recommendations */
   align-items: stretch; /* Ensure equal height */
   width: 100%; /* Ensure it takes full width */
-  max-width: 700px; /* Constrain combined width */
+  max-width: 680px; /* Constrain combined width */
   /* height: 156px; */ /* Removed fixed height */
 }
 
@@ -101,18 +108,33 @@
 
 .recommendations-section-header {
   background-color: white;
-  padding: 1rem;
+  padding: 1rem 0.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #555;
   flex-grow: 1; /* Allow recommendations to grow */
-  max-width: 180px; /* Narrow the recommendations block */
+  max-width: 200px; /* Narrow the recommendations block */
   min-height: 88px; /* Adjusted min-height to match total height of description block */
 }
 
-.recommendations-section-header p {
-  text-align: center;
-  font-weight: 500;
+.MuiListItemText-primary {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.recommendation-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contest-name-full-text {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  width: auto !important; /* Ensure it takes necessary width */
+  min-width: 0 !important; /* Override any default min-width */
 }
 
 .team-detail-body {
@@ -125,22 +147,6 @@
   grid-template-areas:
     "info calendar members"
     "integrations calendar members";
-}
-
-.team-info-box {
-  grid-area: info;
-}
-
-.team-members-box {
-  grid-area: members;
-}
-
-.calendar-section {
-  grid-area: calendar;
-}
-
-.links-section {
-  grid-area: integrations;
 }
 
 .team-info-box,
@@ -157,12 +163,23 @@
 }
 
 .team-info-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 0.75rem; /* Space between info and members box */
-  padding: 0.5rem; /* Reduced padding */
+  padding: 0.1rem 0.25rem 0.1rem 0.5rem; /* Increased top and left padding */
 }
 
 .team-members-box {
   padding: 1.5rem; /* Increased padding */
+}
+
+.calendar-section {
+  grid-area: calendar;
+}
+
+.links-section {
+  grid-area: integrations;
 }
 
 .team-info-box h3,
@@ -202,15 +219,6 @@
   color: #555;
 }
 
-.calendar-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-  font-size: 1.2rem;
-  border: 1px solid #e0e0e0;
-}
-
 .links-section ul {
   list-style: none;
   padding: 0;
@@ -227,3 +235,24 @@
   border-bottom: none;
 }
 
+/* Style for the deadline date on the calendar */
+.react-calendar__tile.deadline-date abbr {
+  color: #333 !important;
+  font-weight: bold;
+}
+
+.react-calendar__tile.deadline-date {
+  background-color: #e8f5e9 !important; /* Very light green background */
+}
+
+.recommendation-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.recommendation-card {
+  width: 180px;
+  text-align: center;
+}

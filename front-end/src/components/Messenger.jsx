@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { IconButton, Button } from '@mui/material'; // Import IconButton and Button
+import AddIcon from '@mui/icons-material/Add'; // Import AddIcon
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import axios from 'axios'; // Import axios
 import './Messenger.css';
 
 const Messenger = () => {
@@ -11,6 +15,7 @@ const Messenger = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchedUsers, setSearchedUsers] = useState([]); // Changed from searchedUser to searchedUsers
   const socket = useRef(null);
+  const messagesEndRef = useRef(null); // Ref for the end of messages
   const userId = JSON.parse(localStorage.getItem('user'))?.id;
   console.log('Messenger component rendering. userId:', userId); // Log userId at component render
 
@@ -37,7 +42,12 @@ const Messenger = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          setConversations(data);
+          const sortedConversations = data.sort((a, b) => {
+            if (!a.latest_message) return 1;
+            if (!b.latest_message) return -1;
+            return new Date(b.latest_message.created_at) - new Date(a.latest_message.created_at);
+          });
+          setConversations(sortedConversations);
         } else {
           console.error('Failed to fetch conversations');
         }
@@ -148,6 +158,21 @@ const Messenger = () => {
         if (selectedConversation && message.conversation_id === selectedConversation.id) {
           setMessages((prevMessages) => [...prevMessages, message]);
         }
+
+        setConversations(prevConversations => {
+          const updatedConversations = prevConversations.map(convo => {
+            if (convo.id === message.conversation_id) {
+              return { ...convo, latest_message: message };
+            }
+            return convo;
+          });
+
+          return updatedConversations.sort((a, b) => {
+            if (!a.latest_message) return 1;
+            if (!b.latest_message) return -1;
+            return new Date(b.latest_message.created_at) - new Date(a.latest_message.created_at);
+          });
+        });
       };
 
       return () => {
@@ -155,6 +180,14 @@ const Messenger = () => {
       };
     }
   }, [selectedConversation, userId]);
+
+
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    }
+  }, [messages, selectedConversation]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -229,9 +262,146 @@ const Messenger = () => {
       name = 'Team Chat'; // Placeholder
     }
 
-    const latestMessageContent = convo.latest_message ? convo.latest_message.content : 'No messages yet';
+    const latestMessageContent = convo.latest_message ? (() => {
+      try {
+        const parsedContent = JSON.parse(convo.latest_message.content);
+        if (parsedContent.type === 'team_invitation') {
+          return `${parsedContent.inviter_name} has invited you to join ${parsedContent.team_name}!`;
+        }
+      } catch (e) {
+        // Not JSON, or not an invitation type, fall through to default
+      }
+      return convo.latest_message.content;
+    })() : 'No messages yet';
 
     return { name, latestMessageContent };
+  };
+
+  const handleInvitationResponse = async (token, accept) => {
+    try {
+      const response = await axios.post(`/api/v1/teams/invitations/${token}/respond`, 
+        null, // No request body
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+          params: {
+            accept: accept,
+          },
+        }
+      );
+      if (response.status === 200) {
+        alert(accept ? 'Invitation accepted!' : 'Invitation rejected.');
+        // Optionally refresh conversations or navigate
+        // navigate(`/teams/${response.data.team_id}`); // If accepted, navigate to team page
+        // For now, just refresh messages and conversations
+        setSelectedConversation(null); // Clear selected conversation to force re-fetch
+        // Trigger re-fetch of conversations
+        const fetchConversations = async () => {
+          try {
+            const response = await fetch('/api/v1/conversations/', {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+              },
+            });
+            if (response.ok) {
+              const data = await response.json();
+              const sortedConversations = data.sort((a, b) => {
+                if (!a.latest_message) return 1;
+                if (!b.latest_message) return -1;
+                return new Date(b.latest_message.created_at) - new Date(a.latest_message.created_at);
+              });
+              setConversations(sortedConversations);
+            } else {
+              console.error('Failed to fetch conversations');
+            }
+          } catch (error) {
+            console.error('Error fetching conversations:', error);
+          }
+        };
+        fetchConversations();
+
+      } else {
+        alert('Failed to respond to invitation.');
+      }
+    } catch (error) {
+      console.error('Error responding to invitation:', error.response ? error.response.data : error);
+      alert(`Error: ${error.response?.data?.detail || 'Failed to respond to invitation.'}`);
+    }
+  };
+
+  const InvitationMessage = ({ message, onRespond, selectedConversation, userId }) => {
+    const [invitationStatus, setInvitationStatus] = useState(null);
+    let invitationData;
+
+    try {
+      invitationData = JSON.parse(message.content);
+      if (invitationData.type !== 'team_invitation') {
+        return <p>{message.content}</p>;
+      }
+    } catch (e) {
+      return <p>{message.content}</p>;
+    }
+
+    const { team_name, inviter_name, token } = invitationData;
+    const inviter = message.sender;
+    const invited = selectedConversation.participants.find(p => p.id !== inviter.id);
+
+
+    useEffect(() => {
+      const fetchInvitationStatus = async () => {
+        try {
+          const response = await fetch(`/api/v1/teams/invitations/${token}/status`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setInvitationStatus(data.status);
+          } else {
+            console.error('Failed to fetch invitation status');
+          }
+        } catch (error) {
+          console.error('Error fetching invitation status:', error);
+        }
+      };
+
+      if (token) {
+        fetchInvitationStatus();
+      }
+    }, [token]);
+
+    const handleRespond = (accept) => {
+      onRespond(token, accept);
+      setInvitationStatus(accept ? 'accepted' : 'rejected');
+    };
+
+    return (
+      <div className="messenger-invitation-card">
+        <p><strong>{inviter_name}</strong> has invited you to join team <strong>{team_name}</strong>.</p>
+        {message.sender.id !== userId && invitationStatus === 'pending' && (
+          <div className="messenger-invitation-actions">
+            <button className="accept-button" onClick={() => handleRespond(true)}>Accept</button>
+            <button className="reject-button" onClick={() => handleRespond(false)}>Reject</button>
+          </div>
+        )}
+        {invitationStatus === 'accepted' && (
+          <p>
+            {userId === invited.id
+              ? 'You have accepted this invitation.'
+              : `${invited.full_name} has accepted the invitation.`}
+          </p>
+        )}
+        {invitationStatus === 'rejected' && (
+          <p>
+            {userId === invited.id
+              ? 'You have rejected this invitation.'
+              : `${invited.full_name} has rejected the invitation.`}
+          </p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -239,7 +409,19 @@ const Messenger = () => {
       <div className="messenger-sidebar">
         <div className="messenger-sidebar-header">
           <h3>Conversations</h3>
-          <button className="new-conversation-button" onClick={() => setShowNewConversationModal(true)}>+</button>
+          <IconButton
+            color="primary"
+            onClick={() => setShowNewConversationModal(true)}
+            sx={{
+              width: '60px',
+              height: '40px',
+              borderRadius: '4px',
+              // Override default IconButton padding if necessary
+              padding: '8px', // Adjust padding to control icon size within the button
+            }}
+          >
+            <AddIcon />
+          </IconButton>
         </div>
         {showNewConversationModal && (
           <div className="new-conversation-modal">
@@ -271,12 +453,10 @@ const Messenger = () => {
               <div className="new-conversation-member-list">
                 <h4>My Team Members</h4>
                 {teamMembers.length > 0 ? (
-                  teamMembers.slice(0, 3).map((member) => (
-                    member.user ? (
-                      <div key={member.id} className="new-conversation-member-item" onClick={() => startNewConversationWithUser(member.user)}>
-                        {member.user.full_name} ({member.user.email}) {member.user.id === userId && "(me)"}
-                      </div>
-                    ) : null
+                  teamMembers.map((member) => ( // Removed slice(0, 3)
+                    <div key={member.id} className="new-conversation-member-item" onClick={() => startNewConversationWithUser(member)}>
+                      {member.full_name} ({member.email}) {member.id === userId && "(me)"}
+                    </div>
                   ))
                 ) : (
                   <p>No team members found.</p>
@@ -313,7 +493,7 @@ const Messenger = () => {
             <div className="messenger-chat-header">
               <h3>{getConversationDisplayData(selectedConversation, userId).name}</h3>
             </div>
-            <div className="messenger-message-list">
+            <div className="messenger-message-list" ref={messagesEndRef}>
               {messages.map((msg) => (
                 <div key={msg.id} className={`messenger-message-item ${msg.sender.id === userId ? 'sent' : 'received'}`}>
                   {msg.sender.id !== userId && ( // Only show profile for received messages on the left
@@ -325,12 +505,26 @@ const Messenger = () => {
                     </div>
                     <div className="messenger-message-bubble">
                       <div className="messenger-message-content">
-                        {msg.reply_to_message_id && (
-                          <div className="messenger-reply-indicator">
-                            Replying to message ID: {msg.reply_to_message_id}
-                          </div>
-                        )}
-                        <p>{msg.content}</p>
+                        {(() => {
+                          try {
+                            const parsedContent = JSON.parse(msg.content);
+                            if (parsedContent.type === 'team_invitation') {
+                              return <InvitationMessage message={msg} onRespond={handleInvitationResponse} selectedConversation={selectedConversation} userId={userId} />;
+                            }
+                          } catch (e) {
+                            // Not JSON, or not an invitation type, render as plain text
+                          }
+                          return (
+                            <>
+                              {msg.reply_to_message_id && (
+                                <div className="messenger-reply-indicator">
+                                  Replying to message ID: {msg.reply_to_message_id}
+                                </div>
+                              )}
+                              <p>{msg.content}</p>
+                            </>
+                          );
+                        })()}
                       </div>
                       <div className="messenger-message-time-container">
                         <span className="messenger-message-time">{new Date(msg.created_at).toLocaleTimeString()}</span>
@@ -350,7 +544,7 @@ const Messenger = () => {
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message..."
               />
-              <button type="submit">Send</button>
+              <button type="submit" disabled={newMessage.trim() === ''}>Send</button>
             </form>
           </>
         ) : (
