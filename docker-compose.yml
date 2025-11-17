@@ -1,0 +1,24 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  backend:
+    build: ./back-end         
+    container_name: skkuedin-backend 
+    env_file:
+      - ./back-end/.env       
+    volumes:
+      - db_data:/data        
+    ports:
+      - "8000:8000"            
+    
+  frontend:
+    build: ./front-end         
+    container_name: skkuedin-frontend 
+    ports:
+      - "80:80"            # 호스트(EC2) 80 포트 -> 컨테이너 80 포트 (Nginx)
+    depends_on:
+      - backend             
+
+volumes:
+  db_data:  # 컨테이너 재시작되어도 보존

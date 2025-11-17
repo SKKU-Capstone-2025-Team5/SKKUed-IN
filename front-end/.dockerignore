@@ -1,0 +1,21 @@
+# front-end/.dockerignore
+
+# Git
+.git/
+.gitignore
+
+# Node.js 의존성 폴더
+node_modules/
+
+# Vite/React 로컬 개발용 파일
+.env
+.env.local
+.env.development
+.env.test
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
