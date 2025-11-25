@@ -213,28 +213,34 @@ function Profile() {
       {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleUpdate} className="profile-form">
         <div className="profile-image-section">
-          <div className="profile-image-preview">
-            {filePreview ? (
-              <img src={filePreview} alt="Profile Preview" />
-            ) : (
-              <div className="profile-image-placeholder">No Image</div>
-            )}
+          <div className="profile-left-col">
+            <div className="profile-image-controls"> {/* New wrapper for horizontal layout */}
+              <div className="profile-image-preview">
+                {filePreview ? (
+                  <img src={filePreview} alt="Profile Preview" />
+                ) : (
+                  <div className="profile-image-placeholder">No Image</div>
+                )}
+              </div>
+              <div className="profile-image-upload">
+                <input type="file" id="file-upload" accept="image/*" onChange={handleFileChange} />
+                <label htmlFor="file-upload" className="file-upload-label">Choose File</label>
+                <button type="button" onClick={handleUpload} disabled={!selectedFile}>Upload Image</button>
+              </div>
+            </div> {/* End of profile-image-controls */}
           </div>
-          <div className="profile-image-upload">
-            <input type="file" id="file-upload" accept="image/*" onChange={handleFileChange} />
-            <label htmlFor="file-upload" className="file-upload-label">Choose File</label>
-            <button type="button" onClick={handleUpload} disabled={!selectedFile}>Upload Image</button>
+          <div className="profile-right-col">
+            <div>
+              <label>Full Name:</label>
+              <input type="text" name="full_name" value={profile.full_name || ''} onChange={handleChange} />
+            </div>
+            <div>
+              <label>Age:</label>
+              <input type="text" name="age" value={profile.age || ''} onChange={handleChange} />
+            </div>
           </div>
         </div>
-        <div className="profile-grid-fields">
-          <div>
-            <label>Full Name:</label>
-            <input type="text" name="full_name" value={profile.full_name || ''} onChange={handleChange} />
-          </div>
-          <div>
-            <label>Age:</label>
-            <input type="text" name="age" value={profile.age || ''} onChange={handleChange} />
-          </div>
+        <div className="profile-major-phone-section"> {/* New section for Major and Phone Number */}
           <div>
             <label>Major:</label>
             <input type="text" name="major" value={profile.major || ''} onChange={handleChange} />

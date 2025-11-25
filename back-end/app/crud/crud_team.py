@@ -9,15 +9,27 @@ from app.schemas.team import TeamCreate, TeamUpdate, OpenPositionCreate, TeamMem
 from app.schemas.notification import NotificationCreate
 from app.crud.crud_notification import create_notification 
 from app.crud.crud_user import get_user_by_email 
+from app.crud.crud_message import crud_message # Import crud_message
+from app.schemas.message import MessageCreate, ConversationCreate # Import MessageCreate and ConversationCreate
+from app.models.message import ConversationType # Import ConversationType
+from app.models.user import User # Import User model
+import json # Import json
 
 def get_team(db: Session, team_id: int) -> Optional[Team]:
-    return db.query(Team).options(joinedload(Team.members).joinedload(TeamMember.user), joinedload(Team.leader)).filter(Team.id == team_id).first()
+    return db.query(Team).options(
+        joinedload(Team.members).joinedload(TeamMember.user),
+        joinedload(Team.leader),
+        joinedload(Team.contest) # Eagerly load the contest relationship
+    ).filter(Team.id == team_id).first()
 
 def get_teams_by_user(db: Session, user_id: int) -> List[Team]:
     return db.query(Team).options(joinedload(Team.contest)).join(TeamMember).filter(TeamMember.user_id == user_id).all()
 
 def get_public_teams(db: Session, skip: int = 0, limit: int = 100) -> List[Team]:
     return db.query(Team).options(joinedload(Team.contest)).filter(Team.is_public == True).offset(skip).limit(limit).all()
+
+def get_teams_by_contest_id(db: Session, contest_id: int, skip: int = 0, limit: int = 100) -> List[Team]:
+    return db.query(Team).options(joinedload(Team.members).joinedload(TeamMember.user), joinedload(Team.leader)).filter(Team.contest_id == contest_id, Team.is_public == True).offset(skip).limit(limit).all()
 
 def create_team(db: Session, team_in: TeamCreate, leader_id: int) -> Team:
     # 팀 만들기 
@@ -26,7 +38,8 @@ def create_team(db: Session, team_in: TeamCreate, leader_id: int) -> Team:
         description=team_in.description,
         is_public=team_in.is_public,
         member_limit=team_in.member_limit,
-        leader_id=leader_id
+        leader_id=leader_id,
+        contest_id=team_in.contest_id # Add contest_id
     )
     db.add(db_team)
     db.commit()
@@ -219,6 +232,33 @@ def create_invitation(db: Session, team_id: int, email: str, expires_delta: int 
                 deep_link=f"/invitations/{token}"
             )
             create_notification(db, notification_in=notification_in_invited)
+
+            # Send messenger message with invitation
+            inviter_user = db.query(User).filter(User.id == team.leader_id).first()
+            if inviter_user:
+                # Find or create a DM conversation between inviter and invited user
+                participant_ids = sorted([inviter_user.id, invited_user.id])
+                conversation = crud_message.get_conversation_by_participants(db, participant_ids)
+                if not conversation:
+                    conversation_in = ConversationCreate(participant_ids=participant_ids, type=ConversationType.DM)
+                    conversation = crud_message.create_conversation(db, conversation_in=conversation_in, current_user_id=inviter_user.id)
+
+                if conversation:
+                    message_content_data = {
+                        "type": "team_invitation",
+                        "team_id": team.id,
+                        "team_name": team.name,
+                        "inviter_id": inviter_user.id,
+                        "inviter_name": inviter_user.full_name,
+                        "token": token
+                    }
+                    message_content = json.dumps(message_content_data)
+
+                    message_in = MessageCreate(
+                        conversation_id=conversation.id,
+                        content=message_content
+                    )
+                    crud_message.create_message(db, message_in=message_in, sender_id=inviter_user.id)
 
     return db_invitation
 
