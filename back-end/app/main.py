@@ -18,6 +18,7 @@ app.mount("/images", StaticFiles(directory="../front-end/public/images"), name="
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:80"
 ]
 
 app.add_middleware(

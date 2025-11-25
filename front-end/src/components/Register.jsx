@@ -23,7 +23,7 @@ function Register() {
     setError('');
 
     try {
-      await axios.post('http://127.0.0.1:8000/api/v1/auth/register', {
+      const response = await axios.post('/api/v1/auth/register', {
         email: email,
         password: password,
         full_name: fullName
