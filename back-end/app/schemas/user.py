@@ -15,7 +15,7 @@ class UserBase(BaseModel):
     introduction: Optional[str] = Field(None, max_length=1000)
     profile_image_url: Optional[str] = None
     # core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
-    # interests: Optional[List[str]] = Field(None, max_items=30) # This was probably replaced by the relationship
+    # interests: Optional[List[str]] = Field(None, max_items=30)
     phone_number_public: Optional[bool] = True
     age_public: Optional[bool] = True
 
@@ -25,25 +25,26 @@ class UserCreate(UserBase):
     is_superuser: bool = False
     skills: Optional[List[str]] = []
     interests: Optional[List[str]] = []
+    # similarity: Optional[float] = None  # ⛔ 추천용 값이니까 제거
 
 
 class UserInDBBase(UserBase):
     id: Optional[int] = None
+
     class Config:
         from_attributes = True
 
 
-
-
-
-# Properties to return to client
+# Properties to return to client (기본 유저 응답)
 class User(UserInDBBase):
     skills: List[Skill] = []
     interests: List[Interest] = []
 
-# Properties stored in DB
+
+# DB 저장용
 class UserInDB(User):
     hashed_password: str
+
 
 class UserUpdate(BaseModel):
     password: Optional[str] = None
@@ -59,3 +60,8 @@ class UserUpdate(BaseModel):
     # core_skill_tags: Optional[List[str]] = Field(None, max_items=30)
     phone_number_public: Optional[bool] = None
     age_public: Optional[bool] = None
+
+
+# ✅ 추천 결과용 응답 스키마
+class UserWithSimilarity(User):
+    similarity: float
