@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './ContestDetail.css';
 
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
+
 // D-Day 계산 함수 
 const calculateDday = (endDateString) => {
     if (!endDateString) return '';
@@ -22,6 +29,8 @@ function ContestDetail() {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showTeamDetailDialog, setShowTeamDetailDialog] = useState(false);
+  const [selectedTeamForDialog, setSelectedTeamForDialog] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,16 +51,13 @@ function ContestDetail() {
         setContest(contestData);
 
         // --- 데이터 요청 2: 공개 팀 목록 ---
-        const teamsResponse = await fetch('http://127.0.0.1:8000/api/v1/teams/public', {
+        const teamsResponse = await fetch(`/api/v1/teams/by_contest/${contestId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!teamsResponse.ok) {
           throw new Error('팀 목록을 불러오는 데 실패했습니다.');
         }
-        const allTeamsData = await teamsResponse.json();
-
-        // 전체 팀 목록에서 '이 공모전'에 해당하는 팀만 필터링
-        const filteredTeams = allTeamsData.filter(team => team.contest_id === contestId);
+        const filteredTeams = await teamsResponse.json();
         setTeams(filteredTeams);
 
       } catch (err) {
@@ -63,6 +69,16 @@ function ContestDetail() {
 
     fetchData();
   }, [contestId]);
+
+  const handleOpenTeamDetailDialog = (team) => {
+    setSelectedTeamForDialog(team);
+    setShowTeamDetailDialog(true);
+  };
+
+  const handleCloseTeamDetailDialog = () => {
+    setShowTeamDetailDialog(false);
+    setSelectedTeamForDialog(null);
+  };
 
   if (loading) {
     return <div>데이터를 불러오는 중입니다...</div>;
@@ -82,7 +98,11 @@ function ContestDetail() {
       
       {/* --- 1. 공모전 상세 카드 (가로형) --- */}
       <div className="detail-card-horizontal">
-        <img src={contest.ex_image} alt={contest.ex_name} className="detail-card-image" />
+        <img
+          src={contest.ex_image || '/images/placeholder_contest.png'} // Use a placeholder if ex_image is empty
+          alt={contest.ex_name}
+          className="detail-card-image"
+        />
         <div className="detail-card-content">
           <h1 className="detail-title">{contest.ex_name}</h1>
           <p className="detail-host">주최: {contest.ex_host}</p>
@@ -99,7 +119,12 @@ function ContestDetail() {
 
       {/* --- 2. 참여중인 팀 목록 --- */}
       <div className="team-list-section">
-        <h2>이 공모전에 참여중인 팀 ({teams.length}개)</h2>
+        <div className="team-list-header">
+          <h2>이 공모전에 참여중인 팀 ({teams.length}개)</h2>
+          <Link to={`/teams/create?contestId=${contestId}`} className="create-team-button">
+            + 새 팀 만들기
+          </Link>
+        </div>
         
         {teams.length > 0 ? (
           <div className="team-list">
@@ -107,12 +132,14 @@ function ContestDetail() {
               // 🚨 가정: 팀 객체(team)에 'id'와 'name' 필드가 있다고 가정합니다.
               <div key={team.id} className="team-card">
                 <h4 className="team-name">{team.name}</h4>
-                {/* 🚨 가정: 팀 객체(team)에 'description' 필드가 있다고 가정합니다. */}
-                <p className="team-description">{team.description}</p>
-                {/* 팀 상세 페이지로 이동하거나, '참여하기' 버튼을 여기에 추가 */}
-                <Link to={`/teams/${team.id}`} className="team-join-button">
+                <div className="team-leader-info">
+                  <Avatar src={team.leader.profile_image_url ? `http://127.0.0.1:8000${team.leader.profile_image_url}` : '/images/basic_profile.png'} sx={{ width: 60, height: 60 }} />
+                  <p style={{ fontWeight: 'bold', fontSize: '1.1rem', marginTop: 0 }}>{team.leader.full_name}</p>
+                </div>
+                <p className="team-members-status">{team.members.length} / {team.member_limit}</p>
+                <button onClick={() => handleOpenTeamDetailDialog(team)} className="team-join-button">
                   팀 정보 보기
-                </Link>
+                </button>
               </div>
             ))}
           </div>
@@ -120,13 +147,33 @@ function ContestDetail() {
           <p>아직 이 공모전에 참여중인 팀이 없습니다. 첫 번째 팀을 만들어보세요!</p>
         )}
         
-        {/* POST /api/v1/teams/ API를 사용하는 '팀 생성하기' 버튼.
-          팀 생성 페이지로 이동하거나 모달(Modal)을 띄울 수 있습니다.
-        */}
-        <Link to="/teams/create" className="create-team-button">
-          + 새 팀 만들기
-        </Link>
       </div>
+
+      {/* Team Detail Dialog */}
+      <Dialog open={showTeamDetailDialog} onClose={handleCloseTeamDetailDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{selectedTeamForDialog?.name}</DialogTitle>
+        <DialogContent>
+          <div className="team-description-block">
+            <p>{selectedTeamForDialog?.description}</p>
+          </div>
+          <p><strong>현재 멤버</strong><br /> {selectedTeamForDialog?.members.length} / {selectedTeamForDialog?.member_limit}</p>
+          <h4>팀 멤버</h4>
+          <div className="team-members-container">
+            {selectedTeamForDialog?.members.map(member => (
+              <div key={member.id} className="team-member-card">
+                <Avatar src={member.user.profile_image_url ? `http://127.0.0.1:8000${member.user.profile_image_url}` : '/images/basic_profile.png'} sx={{ width: 32, height: 32 }} />
+                <div className="member-details">
+                  <span className="member-name">{member.user.full_name}</span>
+                  <span className="member-role">({member.role})</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseTeamDetailDialog}>닫기</Button>
+        </DialogActions>
+      </Dialog>
 
     </div>
   );

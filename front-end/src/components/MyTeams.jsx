@@ -50,7 +50,7 @@ function MyTeams() {
   const loggedInUserId = getUserId();
 
   return (
-    <Container className="my-teams-container">
+    <Container className="my-teams-container" sx={{ maxWidth: '800px' }}>
       <Box className="my-teams-header">
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>My Teams</Typography>
         <Button 
@@ -73,35 +73,41 @@ function MyTeams() {
       {teams.length === 0 ? (
         <Alert severity="info">You are not a member of any teams yet.</Alert>
       ) : (
-        <Grid container spacing={3}>
+        <Box className="team-cards-container">
           {teams.map(team => (
-            <Grid item xs={12} sm={6} md={4} key={team.id}>
-              <Card 
-                className="team-card"
-                elevation={3} // Add elevation for a lifted effect
-                sx={{
-                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
-                  },
-                  backgroundColor: team.status.toLowerCase() === 'recruiting' ? '#e8f5e9' : '#fff', // Light green for recruiting
-                }}
-              >
-                <CardContent className="team-card-content">
-                  <Typography variant="h5" component="h2" gutterBottom className="team-title">
-                    <Link to={`/teams/${team.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{team.name}</Link>
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" paragraph>{team.description}</Typography>
-                  <Typography><strong>Members:</strong> {team.members ? team.members.length : 0} / {team.member_limit}</Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-                    <Chip label={team.status} color={team.status.toLowerCase() === 'recruiting' ? 'success' : 'default'} />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+            <Card 
+              key={team.id}
+              className="team-card"
+              elevation={3} // Add elevation for a lifted effect
+              sx={{
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
+                },
+                backgroundColor: '#fff', // All cards are white
+              }}
+            >
+              <CardContent className="team-card-content">
+                <Typography variant="h5" component="h2" gutterBottom className="team-title">
+                  <Link to={`/teams/${team.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{team.name}</Link>
+                </Typography>
+                <Typography variant="body2" color="textSecondary" paragraph>{team.description}</Typography>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                  <Chip 
+                    label={team.status} 
+                    sx={{
+                      backgroundColor: team.status.toLowerCase() === 'recruiting' ? '#A5D6A7' : undefined,
+                      color: team.status.toLowerCase() === 'recruiting' ? 'white' : undefined,
+                      fontWeight: 'bold'
+                    }}
+                  />
+                </Box>
+              </CardContent>
+            </Card>
           ))}
-        </Grid>
+        </Box>
       )}
     </Container>
   );

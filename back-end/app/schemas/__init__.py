@@ -22,6 +22,7 @@ from .team import (
     OpenPositionRead,
     InvitationCreate,
     InvitationRead,
+    InvitationStatusRead,
 )
 from .notification import (
     NotificationCreate,

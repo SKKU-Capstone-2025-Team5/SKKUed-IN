@@ -16,10 +16,16 @@
   font-weight: bold;
 }
 
+.team-cards-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
 .team-card {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0; /* Remove previous margin-bottom as gap handles it */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: all 0.2s ease-in-out;
 }

@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+#from app.db.base_class import Base
 
 
 user_skill_association = Table(

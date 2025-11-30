@@ -2,7 +2,9 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, HttpUrl
 from app.models.team import TeamStatus, TeamMemberRole, TeamMemberStatus, InvitationStatus
+
 from app.schemas.user import UserInDBBase # Import UserInDBBase
+from app.schemas.contest import Contest # Import Contest schema
 
 # Team Schemas
 class TeamBase(BaseModel):
@@ -12,7 +14,7 @@ class TeamBase(BaseModel):
     member_limit: int
 
 class TeamCreate(TeamBase):
-    pass
+    contest_id: Optional[int] = None
 
 class TeamUpdate(BaseModel):
     name: Optional[str] = None
@@ -21,13 +23,18 @@ class TeamUpdate(BaseModel):
     member_limit: Optional[int] = None
     status: Optional[TeamStatus] = None
     leader_id: Optional[int] = None
+    contest_id: Optional[int] = None
 
 class TeamRead(TeamBase):
     id: int
     status: TeamStatus
     leader_id: int
+    leader: UserInDBBase # Add this line
     created_at: datetime
     updated_at: Optional[datetime] = None
+    contest_id: Optional[int] = None
+    contest: Optional[Contest] = None
+
     members: List["TeamMemberRead"] = [] # Add this line
 
     class Config:
@@ -40,12 +47,12 @@ class OpenPositionBase(BaseModel):
     required_count: int = 1
 
 class OpenPositionCreate(OpenPositionBase):
-    team_id: Optional[int] = None # Will be set by the backend
+    team_id: Optional[int] = None 
 
 class OpenPositionRead(OpenPositionBase):
     id: int
     team_id: int
-    filled_count: int # New field
+    filled_count: int 
 
     class Config:
         from_attributes = True
@@ -56,7 +63,7 @@ class TeamMemberBase(BaseModel):
     role: TeamMemberRole = TeamMemberRole.MEMBER
 
 class TeamMemberCreate(TeamMemberBase):
-    team_id: Optional[int] = None # Will be set by the backend
+    team_id: Optional[int] = None 
 
 class TeamMemberRead(TeamMemberBase):
     id: int
@@ -72,16 +79,23 @@ class InvitationBase(BaseModel):
     email: str
 
 class InvitationCreate(InvitationBase):
-    team_id: Optional[int] = None # Will be set by the backend
+    team_id: Optional[int] = None 
+
+    class Config:
+        from_attributes = True
 
 class InvitationRead(InvitationBase):
     id: int
     team_id: int
-    token: str
-    expires_at: datetime
     status: InvitationStatus
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    expires_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class InvitationStatusRead(BaseModel):
+    status: InvitationStatus
 
     class Config:
         from_attributes = True

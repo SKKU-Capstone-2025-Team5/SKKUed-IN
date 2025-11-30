@@ -99,7 +99,7 @@ class CRUDMessage:
 
     def get_messages_in_conversation(self, db: Session, conversation_id: int, skip: int = 0, limit: int = 100) -> List[Message]:
         return db.query(Message).filter(Message.conversation_id == conversation_id).order_by(Message.created_at).offset(skip).limit(limit).all() # type: ignore
-
+        '''
     def create_message(self, db: Session, message_in: MessageCreate, sender_id: int) -> Message:
         db_message = Message(
             content=message_in.content,
@@ -108,6 +108,36 @@ class CRUDMessage:
             file_url=str(message_in.file_url) if message_in.file_url else None,
             reply_to_message_id=message_in.reply_to_message_id,
         )
+        db.add(db_message)
+        db.commit()
+        db.refresh(db_message)
+        return db_message
+        '''
+    def create_message(self, db: Session, message_in: MessageCreate, sender_id: int) -> Message:
+        # 실제 Message 모델에 존재하는 컬럼만 넣는다
+        message_cols = set(Message.__table__.columns.keys())
+
+        kwargs = {}
+
+        if "content" in message_cols:
+            kwargs["content"] = message_in.content
+
+        if "sender_id" in message_cols:
+            kwargs["sender_id"] = sender_id
+
+        if "conversation_id" in message_cols:
+            kwargs["conversation_id"] = message_in.conversation_id
+
+        # 선택 컬럼들: 모델에 있을 때만, 값이 있을 때만 추가
+        file_url_val = getattr(message_in, "file_url", None)
+        if "file_url" in message_cols and file_url_val:
+            kwargs["file_url"] = str(file_url_val)
+
+        reply_to_val = getattr(message_in, "reply_to_message_id", None)
+        if "reply_to_message_id" in message_cols and reply_to_val:
+            kwargs["reply_to_message_id"] = reply_to_val
+
+        db_message = Message(**kwargs)
         db.add(db_message)
         db.commit()
         db.refresh(db_message)
