@@ -46,7 +46,7 @@ function Profile() {
       }
 
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/v1/profile/me', {
+        const response = await axios.get('/api/v1/profile/me', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -104,7 +104,7 @@ function Profile() {
 
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/uploads/uploadfile/', formData, {
+      const response = await axios.post('/api/v1/uploads/uploadfile/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -117,7 +117,7 @@ function Profile() {
       }));
 
       // Automatically update the profile in the backend with the new image URL
-      await axios.put('http://127.0.0.1:8000/api/v1/profile/me', { profile_image_url: imageUrl }, {
+      await axios.put('/api/v1/profile/me', { profile_image_url: imageUrl }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -147,7 +147,7 @@ function Profile() {
     console.log('Selected Interests being submitted:', selectedInterests);
 
     try {
-      await axios.put('http://127.0.0.1:8000/api/v1/profile/me', dataToSubmit, {
+      await axios.put('/api/v1/profile/me', dataToSubmit, {
         headers: {
           Authorization: `Bearer ${token}`
         }
