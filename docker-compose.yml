@@ -7,8 +7,10 @@ services:
     env_file:
       - ./back-end/.env       
     volumes:
-      - db_data:/data
+      - ./back-end/skkuedin.db:/app/app.db
       - ./front-end/public:/front-end/public:ro
+    environment:
+      - DATABASE_URL=sqlite:////app/app.db
     ports:
       - "8000:8000"            
     
@@ -19,6 +21,3 @@ services:
       - "80:80"            # 호스트(EC2) 80 포트 -> 컨테이너 80 포트 (Nginx)
     depends_on:
       - backend             
-
-volumes:
-  db_data:  # 컨테이너 재시작되어도 보존
