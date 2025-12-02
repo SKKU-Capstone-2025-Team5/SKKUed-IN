@@ -11,6 +11,10 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import contest_db
 
 def dev_crawling(driver):
@@ -102,15 +106,19 @@ def link_crawling(driver):
                                 text, "%Y.%m.%d"
                             ).date()  # 두 번째로 찾은 날짜는 종료일로 설정
                             break  # 종료일을 찾으면 반복 중단
+                
+                try:
+                    # 이미지 URL 가져오기 (src가 실제 URL로 설정될 때까지 대기)
+                    img_element = driver.find_element(By.CLASS_NAME, "card-image")
+                    WebDriverWait(driver, 15).until(
+                        lambda driver: img_element.get_attribute("src").startswith("http")
+                    )
+                    # 이미지 URL을 가져옴
+                    img = img_element.get_attribute("src")
 
-                # 이미지 URL 가져오기 (src가 실제 URL로 설정될 때까지 대기)
-                img_element = driver.find_element(By.CLASS_NAME, "card-image")
-                WebDriverWait(driver, 15).until(
-                    lambda driver: img_element.get_attribute("src").startswith("http")
-                )
-                # 이미지 URL을 가져옴
-                img = img_element.get_attribute("src")
-
+                except Exception:
+                    img = None
+                    
                 # 현재 페이지의 URL을 저장
                 current_url = driver.current_url
                 # print(img, current_url)
@@ -152,9 +160,13 @@ def link_crawling(driver):
 def main():
     options = Options()
     options.add_argument("--disable-gpu")
-    options.add_argument("--headless")
+    options.add_argument("--headless=new")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     crawling_data = []
 
     try:
