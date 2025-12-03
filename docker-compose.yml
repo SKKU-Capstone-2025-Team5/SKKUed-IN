@@ -9,6 +9,7 @@ services:
     volumes:
       - db_data:/data
       - ./front-end/public:/front-end/public:ro
+      - ./front-end/public/images:/app/images:ro
     ports:
       - "8000:8000"            
     
