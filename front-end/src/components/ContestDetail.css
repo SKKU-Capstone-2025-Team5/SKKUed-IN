@@ -1,0 +1,233 @@
+/* ContestDetail.css */
+
+.detail-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 0; /* Removed border-radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-card-horizontal {
+  display: flex;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 1.5rem; /* Reduced margin-bottom */
+}
+
+.detail-card-image {
+  width: 250px;
+  height: auto;
+  object-fit: cover;
+}
+
+.detail-card-content {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.detail-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0 0 0.5rem 0;
+}
+
+.detail-host {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.detail-dates {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.detail-dday {
+  font-weight: bold;
+  color: white;
+  background-color: #66BB6A;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.detail-link-button {
+  display: inline-block;
+  background-color: #A5D6A7;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.2s;
+  width: 200px;
+}
+
+.detail-link-button:hover {
+  background-color: #66BB6A;
+}
+
+.team-list-section {
+  background: #ffffff;
+  padding: 0 2rem 0.5rem 2rem; /* Reintroduced 0.5rem padding at the bottom */
+  border-radius: 0; /* Removed border-radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.team-list-section h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0; /* Remove bottom margin as it's now in a flex container */
+  color: #333;
+}
+
+.team-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem; /* Reduced margin below the header */
+  padding-bottom: 1rem; /* Add padding for the border */
+  border-bottom: 2px solid #eee; /* Move border to the header */
+}
+
+.team-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.team-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.8rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 280px; /* Reverted width */
+  text-align: center;
+}
+
+.team-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 0 0.2rem 0;
+}
+
+.team-description {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.7em;
+}
+
+.team-description-block {
+  max-height: 150px; /* Adjust as needed */
+  overflow-y: auto;
+  border: 1px solid #eee;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.team-leader-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0;
+  margin-top: 0.5rem;
+}
+
+.team-members-status {
+  margin-bottom: 0.2rem;
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.team-members-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
+  max-height: 150px; /* Adjust as needed */
+  overflow-y: auto;
+  border: 1px solid #eee;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.team-member-card {
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
+}
+
+.member-name {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.member-role {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.team-join-button {
+  display: block;
+  background-color: #A5D6A7;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.team-join-button:hover {
+  background-color: #66BB6A;
+}
+
+.create-team-button {
+  display: inline-block;
+  background-color: #66BB6A;
+  color: white;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+  margin-top: 0.5rem; /* Moved down slightly */
+}
+
+.create-team-button:hover {
+  background-color: #A5D6A7;
+}

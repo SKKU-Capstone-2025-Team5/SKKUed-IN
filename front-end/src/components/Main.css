@@ -1,0 +1,118 @@
+.main-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f4f7f6; /* 배경색을 살짝 추가 */
+}
+
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.sort-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.main-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.contest-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem; /* 카드 사이의 간격 */
+}
+
+.contest-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden; /* 이미지가 카드를 삐져나가지 않도록 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out;
+  background-color: white;
+}
+
+.contest-card:hover {
+  transform: translateY(-5px); /* 마우스를 올리면 살짝 올라가는 효과 */
+}
+
+/* Link 태그의 기본 파란색, 밑줄 스타일 제거 */
+.card-link {
+  text-decoration: none;
+  color: inherit; /* 부모 요소의 글자 색상을 따름 */
+  display: block;
+}
+
+.card-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* 1:1 비율의 정사각형 이미지 영역 */
+}
+
+.card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지가 찌그러지지 않고 영역을 꽉 채우도록 */
+}
+
+.card-d-day {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: #d90000; /* D-day 강조 (빨간색) */
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0 0 0.5rem 0;
+  
+  /* 제목이 너무 길면 ...으로 자르기 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-organization {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 1rem 0;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #888;
+}

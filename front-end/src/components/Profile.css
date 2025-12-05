@@ -1,0 +1,306 @@
+/* Profile.css */
+
+.profile-container {
+  max-width: 100%;
+  margin: 0;
+  padding: 30px 40px; /* Reduced horizontal padding */
+  background-color: #f9f9f9;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: 100vh;
+}
+
+.profile-header {
+  text-align: left; /* Align text to the left */
+  margin-bottom: 20px;
+}
+
+.profile-header h2 {
+  font-size: 2.5rem; /* Larger font size for the title */
+  font-weight: bold;
+}
+
+.profile-form div {
+  margin-bottom: 15px;
+}
+
+.profile-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="email"],
+.profile-form textarea {
+  width: calc(100% - 22px); /* Adjust for padding and border */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+.profile-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.profile-form input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.profile-form button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #A5D6A7; /* Login page green */
+  color: white; /* Changed to white */
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.profile-form button[type="submit"]:hover {
+  background-color: #66BB6A; /* Darker green for hover */
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Profile Image Section */
+.profile-image-section {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  gap: 30px; /* Gap between left and right columns */
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.profile-image-preview {
+  width: 150px; /* Fixed width for the preview area */
+  height: 150px; /* Fixed height for the preview area */
+  border-radius: 50%; /* Make it circular */
+  overflow: hidden; /* Hide overflowing parts of the image */
+  border: 2px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0e0e0; /* Placeholder background */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.profile-image-preview img {
+  width: 100%; /* Make image fill the circular container */
+  height: 100%;
+  object-fit: cover; /* Cover the area, cropping if necessary */
+}
+
+.profile-image-placeholder {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.profile-left-col,
+.profile-right-col {
+  flex: 1; /* Take equal width */
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Gap between items within the column */
+}
+
+.profile-image-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* Vertically center image and buttons */
+  gap: 20px; /* Space between image and buttons */
+  margin-left: 60px; /* Move right */
+  margin-top: 20px; /* Move down */
+}
+
+.profile-image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center; /* Center content vertically */
+  /* margin-top removed, now handled by profile-left-col gap */
+}
+
+.profile-major-phone-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns */
+  gap: 15px 30px; /* Row gap, column gap */
+  margin-bottom: 15px;
+}
+
+.profile-major-phone-section > div {
+  margin-bottom: 0; /* Reset margin-bottom from .profile-form div */
+}
+
+
+
+.profile-image-upload input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.profile-image-upload .file-upload-label {
+  background-color: #A5D6A7; /* Login page green */
+  color: white; /* Changed to white */
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.profile-image-upload .file-upload-label:hover {
+  background-color: #66BB6A; /* Darker green for hover */
+}
+
+.profile-image-upload button {
+  background-color: #A5D6A7; /* Login page green */
+  color: white; /* Changed to white */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.profile-image-upload button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.profile-image-upload button:hover:not(:disabled) {
+  background-color: #66BB6A; /* Darker green for hover */
+}
+
+
+/* Tag selection container */
+.tag-selection-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Allow buttons to expand slightly, but maintain grid */
+  gap: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/* Tag button */
+.tag-button {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #e8f5e9;
+  color: #333;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all 0.2s ease-in-out;
+  white-space: normal; /* Allow text to wrap */
+}
+
+.tag-button:hover {
+  background-color: #d4e9d4; /* Slightly darker on hover */
+}
+
+.tag-button.selected {
+  background-color: #66BB6A;
+  color: white;
+  border-color: #66BB6A;
+}
+
+/* Custom tag input */
+.custom-tag-input {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  align-items: center; /* Vertically align items */
+}
+
+.custom-tag-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  height: 38px; /* Explicit height for alignment */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  margin: 0; /* Reset margin */
+  vertical-align: middle; /* Explicit vertical alignment */
+  line-height: normal; /* Ensure consistent line height */
+}
+
+.custom-tag-input button {
+  padding: 8px 12px;
+  background-color: #A5D6A7;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  height: 38px; /* Explicit height for alignment */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  flex-shrink: 0; /* Prevent button from shrinking */
+  width: auto; /* Allow button to size based on content */
+  margin: 0; /* Reset margin */
+  vertical-align: middle; /* Explicit vertical alignment */
+  line-height: normal; /* Ensure consistent line height */
+}
+
+/* Selected tags display */
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.selected-tag {
+  padding: 5px 10px;
+  background-color: #66BB6A;
+  color: white;
+  border-radius: 15px;
+  font-size: 0.85em;
+  display: flex;
+  align-items: center; /* Center align items for single line */
+  justify-content: center; /* Center align text */
+  gap: 5px;
+  white-space: nowrap; /* Ensure single line */
+  overflow: hidden; /* Hide overflowing content */
+  text-overflow: ellipsis; /* Show ellipsis for truncated text */
+}
+
+.selected-tag button {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 5px;
+}
+
+/* New styles for grid fields */
+.profile-grid-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns */
+  gap: 15px 30px; /* Row gap, column gap */
+  margin-bottom: 15px;
+}
+
+.profile-grid-fields > div {
+  margin-bottom: 0; /* Reset margin-bottom from .profile-form div */
+}
+
+/* Remove bold from checkbox labels */
+.profile-form div label:has(input[type="checkbox"])) {
+  font-weight: normal;
+}
+
+.profile-form {
+  max-width: 1000px; /* Even wider form content */
+  margin: 0 auto;
+}
