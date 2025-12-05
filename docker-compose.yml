@@ -19,7 +19,21 @@ services:
     ports:
       - "80:80"            # 호스트(EC2) 80 포트 -> 컨테이너 80 포트 (Nginx)
     depends_on:
-      - backend             
+      - backend
+
+  crawler:
+    build: ./contest-crawler
+    container_name: skkuedin-crawler
+    shm_size: '2gb'
+    environment:
+      - DATABASE_URL=sqlite:////data/test.db
+    # env_file:
+    #   - ./back-end/.env
+    depends_on:
+      - backend
+    volumes:
+      - db_data:/data
+      - ./back-end/app:/app/app             
 
 volumes:
   db_data:  # 컨테이너 재시작되어도 보존
